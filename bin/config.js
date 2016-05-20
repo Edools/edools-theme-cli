@@ -1,0 +1,100 @@
+'use strict';
+
+let gutil = require('gulp-util');
+let _ = require('lodash');
+
+exports.paths = {
+  base: process.cwd() + '/',
+  dist: 'dist/',
+  assets: 'assets/',
+  scss: 'assets/scss/',
+  css: 'assets/css/',
+  js: 'assets/js/',
+  images: 'assets/images/',
+  layouts: 'layouts/',
+  snippets: 'snippets/',
+  templates: 'templates/',
+  config: 'config/',
+  locales: 'locales/'
+};
+
+exports.files = {
+  liquid: [
+    exports.paths.assets + '**/*.liquid',
+    exports.paths.snippets + 'snippets/**/*.liquid',
+    exports.paths.templates + 'templates/**/*.liquid',
+    exports.paths.layouts + 'layouts/**/*.liquid',
+    exports.paths.config + 'config/**/*.json',
+    exports.paths.locales + 'locales/**/*.json'
+  ],
+  json: exports.paths.config + '**/*.json',
+  js: [
+    exports.paths.js + '**/*.js',
+    '!' + exports.paths.js + 'vendors/**/*.js'
+  ],
+  js_vendors: exports.paths.js + 'vendors/**/*.js',
+  scss: exports.paths.scss + 'theme.base.scss',
+  images: [
+    exports.paths.images + '**/*.jpg',
+    exports.paths.images + '**/*.jpeg',
+    exports.paths.images + '**/*.png',
+    exports.paths.images + '**/*.gif'
+  ]
+};
+
+exports.build = {
+  js: 'theme.base.min.js',
+  js_vendor: 'theme.base.vendors.min.js',
+  css: 'theme.base.min.css'
+};
+
+exports.theme = require(exports.paths.base + 'theme.json');
+
+exports.combine = (paths) => {
+  let res = '';
+  _.each(paths, (x) => {
+    res += exports.paths[x];
+  });
+
+  return res;
+};
+
+exports.wiredep = {
+  exclude: [
+    /\/bootstrap-sass\/.*\.js/
+  ],
+  directory: 'bower_components'
+};
+
+exports.browser_sync = {
+  open: true,
+  files: [
+    exports.combine(['base', 'dist']) + '*.css',
+    exports.combine(['base', 'dist']) + '*.js'
+  ],
+  serveStatic: [exports.combine(['base', 'dist'])],
+  proxy: exports.theme.sandbox_url,
+  port: 5000,
+  ghostMode: false,
+  rewriteRules: [
+    {
+      match: /(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))/g,
+      replace: '/'
+    },
+    {
+      match: /<body/,
+      fn: () => {
+        return '<body data-no-turbolink="true" ';
+      }
+    }
+  ]
+};
+
+exports.errorHandler = (title) => {
+  'use strict';
+
+  return (err) => {
+    gutil.log(gutil.colors.red('[' + title + ']'), err.toString());
+    this.emit('end');
+  };
+};
