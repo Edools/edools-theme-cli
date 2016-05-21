@@ -5,6 +5,7 @@ let config = require('../config');
 let combConfig = require(config.paths.base + '.csscomb.json');
 let comb = new require('csscomb')(combConfig);
 let browserSync = require('browser-sync').create();
+let sync = require('../sync');
 
 gulp.task('serve', ['build'], () => {
 
@@ -16,17 +17,21 @@ gulp.task('serve', ['build'], () => {
   });
 
   gulp.watch(config.files.js, ['js']);
-  gulp.watch(config.paths.base + 'bower.json', ['js:vendors']);
+  gulp.watch(config.files.liquid, ['copy']);
+  gulp.watch('bower.json', ['js:vendors']);
 
   // upload assets
-  // gulp.watch(deployPaths)
-  //   .on('change', function (file) {
-  //     upload(file, function (f) {
-  //       if (f.path.indexOf('.liquid') > -1 ||
-  //         f.path.indexOf('.json') > -1 ||
-  //         f.path.indexOf('.js') > -1) {
-  //         browserSync.reload();
-  //       }
-  //     });
-  //   });
+  gulp.watch([
+      config.paths.dist + '**/*.*',
+      '!**/*.map'
+    ])
+    .on('change', function (file) {
+      sync.upload_single(file.path, function (f) {
+        if (f.indexOf('.liquid') > -1 ||
+          f.indexOf('.json') > -1 ||
+          f.indexOf('.js') > -1) {
+          browserSync.reload();
+        }
+      });
+    });
 });

@@ -15,7 +15,7 @@ gulp.task('scss', () => {
     .pipe($.concat(config.build.css))
     .pipe($.stripCssComments())
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(config.combine(['base', 'dist'])));
+    .pipe(gulp.dest(config.paths.dist + config.paths.assets));
 });
 
 gulp.task('scss:comb', function (cb) {

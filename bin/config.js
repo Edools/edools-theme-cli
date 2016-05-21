@@ -21,13 +21,14 @@ exports.paths = {
 exports.files = {
   liquid: [
     exports.paths.assets + '**/*.liquid',
-    exports.paths.snippets + 'snippets/**/*.liquid',
-    exports.paths.templates + 'templates/**/*.liquid',
-    exports.paths.layouts + 'layouts/**/*.liquid',
-    exports.paths.config + 'config/**/*.json',
-    exports.paths.locales + 'locales/**/*.json'
+    exports.paths.snippets + '**/*.liquid',
+    exports.paths.templates + '**/*.liquid',
+    exports.paths.layouts + '**/*.liquid'
   ],
-  json: exports.paths.config + '**/*.json',
+  json: [
+    exports.paths.config + '**/*.json',
+    exports.paths.locales + '**/*.json'
+  ],
   js: [
     exports.paths.js + '**/*.js',
     '!' + exports.paths.js + 'vendors/**/*.js'
@@ -50,15 +51,6 @@ exports.build = {
 
 exports.theme = require(exports.paths.base + 'theme.json');
 
-exports.combine = (paths) => {
-  let res = '';
-  _.each(paths, (x) => {
-    res += exports.paths[x];
-  });
-
-  return res;
-};
-
 exports.wiredep = {
   exclude: [
     /\/bootstrap-sass\/.*\.js/
@@ -67,19 +59,19 @@ exports.wiredep = {
 };
 
 exports.browser_sync = {
-  open: true,
+  open: false,
   files: [
-    exports.combine(['base', 'dist']) + '*.css',
-    exports.combine(['base', 'dist']) + '*.js'
+    exports.paths.dist + '*.css',
+    exports.paths.dist + '*.js'
   ],
-  serveStatic: [exports.combine(['base', 'dist'])],
+  serveStatic: [exports.paths.dist],
   proxy: exports.theme.sandbox_url,
   port: 5000,
   ghostMode: false,
   rewriteRules: [
     {
       match: /(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))/g,
-      replace: '/'
+      replace: '/assets/'
     },
     {
       match: /<body/,

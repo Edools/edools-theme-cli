@@ -2,8 +2,8 @@
 
 let gulp = require('gulp');
 let $ = require('gulp-load-plugins')();
-let wiredep = require('wiredep');
 let config = require('../config');
+let wiredep = require('wiredep');
 
 gulp.task('js:vendors', () => {
   let localVendors = [config.paths.base + config.files.js_vendors];
@@ -17,7 +17,7 @@ gulp.task('js:vendors', () => {
     }))
     .pipe($.concat(config.build.js_vendor))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(config.combine(['base', 'dist'])));
+    .pipe(gulp.dest(config.paths.dist + config.paths.assets));
 });
 
 gulp.task('js', () => {
@@ -26,5 +26,5 @@ gulp.task('js', () => {
     .pipe($.uglify().on('error', config.errorHandler('uglify')))
     .pipe($.concat(config.build.js))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(config.combine(['base', 'dist'])));
+    .pipe(gulp.dest(config.paths.dist + config.paths.assets));
 });
