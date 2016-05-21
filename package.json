@@ -8,7 +8,9 @@
     "edt": "./bin/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "jshint --reporter=node_modules/jshint-stylish bin || true",
+    "dev": "watch 'npm run lint' ."
   },
   "repository": {
     "type": "git",
@@ -39,10 +41,16 @@
     "gulp-strip-css-comments": "^1.2.0",
     "gulp-uglify": "^1.5.3",
     "gulp-util": "^3.0.7",
+    "inquirer": "^1.0.2",
     "lodash": "^4.7.0",
     "pretty-hrtime": "^1.0.2",
     "request": "^2.72.0",
     "wiredep": "^4.0.0",
     "wrench": "^1.5.9"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.2",
+    "jshint-stylish": "^2.2.0",
+    "watch": "^0.18.0"
   }
 }

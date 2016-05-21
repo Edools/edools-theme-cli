@@ -12,7 +12,7 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 ### Commands
 
-You can user `edools-theme` or the alias `edt
+You can use `edools-theme` or the alias `edt`
 
 `-h` help
 
@@ -32,3 +32,4 @@ Builds theme locally.
 * Clone Repository
 * Run `$ cd edools-theme-cli && npm i`
 * Run `$ npm link .`
+* Run `$ npm run dev`

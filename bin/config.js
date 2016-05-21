@@ -59,10 +59,10 @@ exports.wiredep = {
 };
 
 exports.browser_sync = {
-  open: false,
+  open: true,
   files: [
-    exports.paths.dist + '*.css',
-    exports.paths.dist + '*.js'
+    exports.paths.dist + exports.paths.assets + '*.css',
+    exports.paths.dist + exports.paths.assets + '*.js'
   ],
   serveStatic: [exports.paths.dist],
   proxy: exports.theme.sandbox_url,

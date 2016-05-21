@@ -16,11 +16,13 @@ gulp.task('serve', ['build'], () => {
     comb.processFile(file.path);
   });
 
+  gulp.watch(config.files.liquid
+    .concat(config.files.json), ['copy']);
+
   gulp.watch(config.files.js, ['js']);
-  gulp.watch(config.files.liquid, ['copy']);
+
   gulp.watch('bower.json', ['js:vendors']);
 
-  // upload assets
   gulp.watch([
       config.paths.dist + '**/*.*',
       '!**/*.map'

@@ -27,13 +27,12 @@ exports.upload_single = (file, cb) => {
     json: reqBody
   }, function (error, response, body) {
     if (error) {
-      console.log(error);
+      gutil.log(error);
       return;
     }
 
     gutil.log('Upload with success!');
 
-    if (cb && typeof cb == 'function')
-      cb(file);
+    if (cb && typeof cb === 'function') cb(file);
   });
 };
