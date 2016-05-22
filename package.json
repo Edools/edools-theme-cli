@@ -49,6 +49,7 @@
     "wrench": "^1.5.9"
   },
   "devDependencies": {
+    "gulp-clean": "^0.3.2",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.2.0",
     "watch": "^0.18.0"

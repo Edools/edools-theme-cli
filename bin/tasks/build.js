@@ -2,4 +2,4 @@
 
 let gulp = require('gulp');
 
-gulp.task('build', ['scss:comb', 'scss', 'js', 'js:vendors', 'copy']);
+gulp.task('build', ['clean', 'scss:comb', 'scss', 'js', 'js:vendors', 'copy']);
