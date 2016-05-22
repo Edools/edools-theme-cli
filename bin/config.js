@@ -72,14 +72,16 @@ exports.browser_sync = {
     {
       match: /(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))/g,
       replace: '/assets/'
-    },
-    {
-      match: /<body/,
-      fn: () => {
-        return '<body data-no-turbolink="true" ';
+    }
+  ],
+  snippetOptions: {
+    rule: {
+      match: /<\/head>/i,
+      fn: function (snippet, match) {
+        return snippet + match;
       }
     }
-  ]
+  }
 };
 
 exports.errorHandler = (title) => {

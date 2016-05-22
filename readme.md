@@ -8,7 +8,7 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 ### Getting Started
 
-`$ npm i -g edools-theme-cli`
+`$ npm i -g git+https://<username>:<password>@bitbucket.org/edools/edools-theme-cli.git`
 
 ### Commands
 
