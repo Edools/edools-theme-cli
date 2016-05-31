@@ -1,5 +1,8 @@
 'use strict';
 
 let gulp = require('gulp');
+let runSequence = require('run-sequence');
 
-gulp.task('build', ['clean', 'scss:comb', 'scss', 'js', 'js:vendors', 'copy']);
+gulp.task('build', (cb) => {
+  runSequence('clean', ['scss:comb', 'scss', 'js', 'js:vendors', 'copy'], cb)
+});

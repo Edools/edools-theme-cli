@@ -30,8 +30,8 @@ exports.files = {
     exports.paths.locales + '**/*.json'
   ],
   js: [
-    exports.paths.js + '**/*.js',
-    '!' + exports.paths.js + 'vendors/**/*.js'
+    exports.paths.js + 'components/**/*.js',
+    exports.paths.js + 'main.js'
   ],
   js_vendors: exports.paths.js + 'vendors/**/*.js',
   scss: exports.paths.scss + 'theme.base.scss',
