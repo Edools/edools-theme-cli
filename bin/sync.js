@@ -19,7 +19,7 @@ exports.upload_single = (file, cb) => {
     }
   };
 
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.theme_id + '/sync/single/' + key);
+  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/single/' + key);
 
   request({
     uri: uri,
