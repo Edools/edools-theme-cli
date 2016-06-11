@@ -8,11 +8,18 @@ let config = require('./config');
 
 exports.upload_single = (file, cb) => {
   let key = file.replace(config.paths.base + config.paths.dist, '');
-  let fileContents = fs.readFileSync(file, {
+  let isImage = file.match(/\.(gif|jpg|jpeg|png)$/i);
+
+  let fileContents = fs.readFileSync(file, !isImage ? {
     encoding: 'utf-8'
-  });
+  } : null);
+
+  if (isImage) {
+    fileContents = new Buffer(fileContents).toString('base64');
+  }
 
   let reqBody = {
+    school_id: config.theme.sandbox_school_id,
     key: key,
     asset: {
       body: fileContents
@@ -25,14 +32,11 @@ exports.upload_single = (file, cb) => {
     uri: uri,
     method: 'PUT',
     json: reqBody
-  }, function (error, response, body) {
-    if (error) {
-      gutil.log(error);
-      return;
+  }, function (err, res) {
+    if (res.statusCode == 204) {
+      gutil.log(`${key} uploaded with success!`);
     }
 
-    gutil.log('Upload with success!');
-
-    if (cb && typeof cb === 'function') cb(file);
+    if (cb && typeof cb === 'function') cb(err, file);
   });
 };

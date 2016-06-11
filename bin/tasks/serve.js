@@ -28,7 +28,7 @@ gulp.task('serve', ['build'], () => {
       '!**/*.map'
     ])
     .on('change', function (file) {
-      sync.upload_single(file.path, function (f) {
+      sync.upload_single(file.path, (err, f) => {
         if (f.indexOf('.liquid') > -1 ||
           f.indexOf('.json') > -1 ||
           f.indexOf('.js') > -1) {

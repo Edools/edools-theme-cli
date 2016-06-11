@@ -81,6 +81,7 @@ function serve() {
 }
 
 function up() {
+  gulp.start('deploy');
 }
 
 function build() {

@@ -43,9 +43,11 @@
     "gulp-util": "^3.0.7",
     "inquirer": "^1.0.2",
     "lodash": "^4.7.0",
+    "merge-stream": "^1.0.0",
     "pretty-hrtime": "^1.0.2",
     "request": "^2.72.0",
     "run-sequence": "^1.2.0",
+    "through2": "^2.0.1",
     "wiredep": "^4.0.0",
     "wrench": "^1.5.9"
   },
