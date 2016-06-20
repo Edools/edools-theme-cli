@@ -1,11 +1,13 @@
 'use strict';
 
 let gulp = require('gulp');
+let gutil = require('gulp-util');
+let fs = require('fs');
 let config = require('../config');
 let combConfig = require(config.paths.base + '.csscomb.json');
 let comb = new require('csscomb')(combConfig);
 let browserSync = require('browser-sync').create();
-let sync = require('../sync');
+let sync = require('../service');
 
 gulp.task('serve', ['build'], () => {
 
@@ -16,11 +18,9 @@ gulp.task('serve', ['build'], () => {
     comb.processFile(file.path);
   });
 
-  gulp.watch(config.files.liquid
-    .concat(config.files.json), ['copy']);
-
+  gulp.watch(config.files.liquid.concat(config.files.json), ['copy:liquid']);
+  gulp.watch(config.files.images, ['copy:images']);
   gulp.watch(config.files.js, ['js']);
-
   gulp.watch('bower.json', ['js:vendors']);
 
   gulp.watch([
@@ -28,12 +28,22 @@ gulp.task('serve', ['build'], () => {
       '!**/*.map'
     ])
     .on('change', function (file) {
-      sync.upload_single(file.path, (err, f) => {
-        if (f.indexOf('.liquid') > -1 ||
-          f.indexOf('.json') > -1 ||
-          f.indexOf('.js') > -1) {
+      if (fs.lstatSync(file.path).isDirectory()) return;
+      sync.upload_single(file, (err, f) => {
+        if (f.path.indexOf('.liquid') > -1 ||
+          f.path.indexOf('.json') > -1 ||
+          f.path.indexOf('.js') > -1) {
           browserSync.reload();
         }
+      });
+    });
+
+  gulp.watch(config.files.themeConfig)
+    .on('change', function (file) {
+      let theme = JSON.parse(fs.readFileSync(file.path));
+      sync.update_theme(theme, (err) => {
+        if (err)
+          gutil.log(err);
       });
     });
 });

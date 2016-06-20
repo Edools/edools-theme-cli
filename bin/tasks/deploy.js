@@ -1,18 +1,15 @@
 'use strict';
 
 let gulp = require('gulp');
+let glob = require('glob-all');
 let config = require('../config');
-let sync = require('../sync');
-var through = require('through2');
+let sync = require('../service');
 
-gulp.task('deploy', ['build'], () => {
-  return gulp.src([
-      config.paths.dist + '/**/*.*',
-      '!**/*.map'
-    ])
-    .pipe(through.obj(function (file, enc, callback) {
-      sync.upload_single(file.path, function (err, f) {
-        callback(err, file);
-      });
-    }));
+gulp.task('deploy', ['build'], (cb) => {
+  let files = glob.sync([
+    config.paths.dist + '**/*.*',
+    '!**/*.map'
+  ]);
+
+  sync.upload_all(files, cb);
 });

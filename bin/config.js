@@ -19,6 +19,7 @@ exports.paths = {
 };
 
 exports.files = {
+  themeConfig: 'theme.json',
   liquid: [
     exports.paths.assets + '**/*.liquid',
     exports.paths.snippets + '**/*.liquid',
@@ -85,8 +86,6 @@ exports.browser_sync = {
 };
 
 exports.errorHandler = (title) => {
-  'use strict';
-
   return (err) => {
     gutil.log(gutil.colors.red('[' + title + ']'), err.toString());
     this.emit('end');

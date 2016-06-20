@@ -27,6 +27,10 @@ Creates a local server which observes for changes in your local files and upload
 
 Builds theme locally.
 
+`--upload` or `u`
+
+Uploads entire theme
+
 ### Development
 
 * Clone Repository
