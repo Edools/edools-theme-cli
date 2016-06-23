@@ -23,10 +23,8 @@ gulp.task('serve', ['build'], () => {
   gulp.watch(config.files.js, ['js']);
   gulp.watch('bower.json', ['js:vendors']);
 
-  gulp.watch([
-      config.paths.dist + '**/*.*',
-      '!**/*.map'
-    ])
+  gulp.watch([config.paths.dist + '**/*.*']
+    .concat(config.files.ignore_for_deploy))
     .on('change', function (file) {
       if (fs.lstatSync(file.path).isDirectory()) return;
       sync.upload_single(file, (err, f) => {

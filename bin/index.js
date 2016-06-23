@@ -4,89 +4,14 @@
 
 let program = require('commander');
 let gulp = require('gulp');
-let gutil = require('gulp-util');
-let prettyTime = require('pretty-hrtime');
-let chalk = require('chalk');
+let fs = require('fs');
+let inquirer = require('inquirer');
+let utils = require('./utils');
 let pkg = require('../package.json');
 let config = require('./config');
 let wrench = require('wrench');
 let auth = require('./auth');
-
-function formatError(e) {
-  if (!e.err) {
-    return e.message;
-  }
-
-  // PluginError
-  if (typeof e.err.showStack === 'boolean') {
-    return e.err.toString();
-  }
-
-  // Normal error
-  if (e.err.stack) {
-    return e.err.stack;
-  }
-
-  // Unknown (string, number, etc.)
-  return new Error(String(e.err)).stack;
-}
-
-function log_events() {
-  let failed = false;
-
-  gulp.on('err', () => {
-    failed = true;
-  });
-
-  gulp.on('task_start', function (e) {
-    // TODO: batch these
-    // so when 5 tasks start at once it only logs one time with all 5
-    gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
-  });
-
-  gulp.on('task_stop', function (e) {
-    let time = prettyTime(e.hrDuration);
-    gutil.log(
-      'Finished', '\'' + chalk.cyan(e.task) + '\'',
-      'after', chalk.magenta(time)
-    );
-  });
-
-  gulp.on('task_err', function (e) {
-    let msg = formatError(e);
-    let time = prettyTime(e.hrDuration);
-    gutil.log(
-      '\'' + chalk.cyan(e.task) + '\'',
-      chalk.red('errored after'),
-      chalk.magenta(time)
-    );
-    gutil.log(msg);
-  });
-
-  gulp.on('task_not_found', function (err) {
-    gutil.log(
-      chalk.red('Task \'' + err.task + '\' is not in your gulpfile')
-    );
-    gutil.log('Please check the documentation for proper gulpfile formatting');
-    process.exit(1);
-  });
-}
-
-function create(name) {
-
-}
-
-function serve() {
-  gulp.start('serve');
-}
-
-function up() {
-  gulp.start('deploy');
-}
-
-function build() {
-  gulp.start('build');
-}
+let service = require('./service');
 
 /**
  *  This will load all js files in the tasks directory
@@ -99,23 +24,133 @@ wrench.readdirSyncRecursive(__dirname + '/tasks')
   require('./tasks/' + file);
 });
 
+function create(name) {
+  //TODO: Clone a git repo thats have a base theme
+}
+
+function serve() {
+  gulp.start('serve');
+}
+
+function upload(file) {
+  if (!file || !fs.statSync(file).isFile()) {
+    inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'ok',
+        message: 'You did not enter the file path, if you decide to proceed, all of server\'s files will be overriden by local files. Do you want to upload all files?',
+        default: 'n'
+      }
+    ]).then((res) => {
+      // upload all files
+      if (res.ok === true) gulp.start('deploy');
+    });
+  } else {
+    // upload single file
+    service.upload_single({
+      path: file
+    });
+  }
+}
+
+function download(file) {
+  if (!file) {
+    inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'ok',
+        message: 'You did not enter the file path, if you decide to proceed, all of local files will be overriden by server\'s files. Do you want to download all files?',
+        default: 'n'
+      }
+    ]).then((res) => {
+      // download all files
+      if (res.ok === true) service.download_all();
+    });
+  } else {
+    // download single file
+    service.download_single(file);
+  }
+}
+
+function build() {
+  gulp.start('build');
+}
+
 let cli = () => {
-  this.log_events = log_events;
   this.signin = auth.signin;
   this.create = create;
   this.serve = serve;
-  this.up = up;
+  this.upload = upload;
+  this.download = download;
   this.build = build;
-  this.log_events();
+
+  utils.log_events();
 
   program
-    .version(pkg.version)
-    .option('c, --create <name>', 'creates a new Edools theme', this.create, null)
-    .option('s, --serve', 'creates a local server which observes for changes in your local files and upload the files to your sandbox url.', this.serve, null)
-    .option('u, --up', 'uploads theme', this.up, null)
-    .option('b, --build', 'builds theme locally', this.build, null)
-    .option('si, --sign-in', 'signin user', this.signin, null)
-    .parse(process.argv);
+    .version(pkg.version);
+
+  /**
+   * Create Command
+   */
+  program
+    .command('create <name>')
+    .alias('c')
+    .description('Create a new Edools theme.')
+    .action(this.create);
+
+
+  /**
+   * Serve Command
+   */
+  program
+    .command('serve')
+    .alias('s')
+    .description('Create a local server which observes for changes in your local files and upload it to your sandbox url.')
+    .action(this.serve);
+
+
+  /**
+   * Upload Command
+   */
+  program
+    .command('upload [file]')
+    .alias('u')
+    .description('Upload a file or uploads all files by giving empty file arg.')
+    .action(this.upload);
+
+
+  /**
+   * Download Command
+   */
+  program
+    .command('download [file]')
+    .alias('d')
+    .description('Download a file or download all files by giving empty file arg.')
+    .action(this.download);
+
+
+  /**
+   * Build Command
+   */
+  program
+    .command('build')
+    .alias('b')
+    .description('Build theme locally.')
+    .action(this.build);
+
+
+  /**
+   * Signin Command
+   */
+  program
+    .command('signin')
+    .alias('si')
+    .description('Signin user.')
+    .option('e, --email <email>', 'User\'s email.')
+    .option('p, --password <password>', 'User\'s password.')
+    .action(this.signin);
+
+  program.parse(process.argv);
 };
 
 process.nextTick(cli);

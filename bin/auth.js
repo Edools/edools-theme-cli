@@ -15,7 +15,8 @@ exports.get_school_params = (cb) => {
   }, cb);
 };
 
-exports.signin = () => {
+exports.signin = (cmd, options) => {
+  console.log(options);
   exports.get_school_params((err, res, params) => {
     inquirer.prompt([
       {

@@ -18,18 +18,18 @@ You can use `edools-theme` or the alias `edt`
 
 `-V` version
 
-`--serve` or `s`
+`serve` or `s`
 
 Creates a local server which observes for changes in your local files and upload the files to your sandbox url.
 
 
-`--build` or `b`
+`build` or `b`
 
 Builds theme locally.
 
-`--upload` or `u`
+`upload` or `u`
 
-Uploads entire theme
+Uploads a single file or the entire theme if no file path provided.
 
 ### Development
 

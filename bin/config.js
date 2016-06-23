@@ -41,6 +41,9 @@ exports.files = {
     exports.paths.images + '**/*.jpeg',
     exports.paths.images + '**/*.png',
     exports.paths.images + '**/*.gif'
+  ],
+  ignore_for_deploy: [
+    '!**/*.map'
   ]
 };
 
