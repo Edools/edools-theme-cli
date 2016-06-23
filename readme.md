@@ -20,7 +20,7 @@ You can use `edools-theme` or the alias `edt`
 
 `serve` or `s`
 
-Creates a local server which observes for changes in your local files and upload the files to your sandbox url.
+Create a local server which observes for changes in your local files and upload the files to your sandbox url.
 
 
 `build` or `b`
@@ -29,7 +29,12 @@ Builds theme locally.
 
 `upload` or `u`
 
-Uploads a single file or the entire theme if no file path provided.
+Upload a single file or the entire theme if no file path provided.
+
+`download` or `d`
+
+Download a single file or the entire theme if no file path provided.
+
 
 ### Development
 
