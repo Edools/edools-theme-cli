@@ -14,6 +14,7 @@ exports.paths = {
   layouts: 'layouts/',
   snippets: 'snippets/',
   templates: 'templates/',
+  mailers: 'mailers/',
   config: 'config/',
   locales: 'locales/'
 };
@@ -24,7 +25,8 @@ exports.files = {
     exports.paths.assets + '**/*.liquid',
     exports.paths.snippets + '**/*.liquid',
     exports.paths.templates + '**/*.liquid',
-    exports.paths.layouts + '**/*.liquid'
+    exports.paths.layouts + '**/*.liquid',
+    exports.paths.mailers + '**/*.liquid'
   ],
   json: [
     exports.paths.config + '**/*.json',
