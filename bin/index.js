@@ -38,7 +38,7 @@ function upload(file) {
       {
         type: 'confirm',
         name: 'ok',
-        message: 'You did not enter the file path, if you decide to proceed, all of server\'s files will be overriden by local files. Do you want to upload all files?',
+        message: 'You did not enter the file path, if you decide to proceed, all of the server\'s files will be overriden by local files. Do you want to upload all files?',
         default: 'n'
       }
     ]).then((res) => {
