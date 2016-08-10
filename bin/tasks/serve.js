@@ -39,9 +39,7 @@ gulp.task('serve', ['build'], () => {
   gulp.watch(config.files.themeConfig)
     .on('change', function (file) {
       let theme = JSON.parse(fs.readFileSync(file.path));
-      sync.update_theme(theme, (err) => {
-        if (err)
-          gutil.log(err);
+      sync.update_theme(theme, () => {
       });
     });
 });

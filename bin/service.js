@@ -8,6 +8,27 @@ let url = require('url');
 let through = require('through2');
 let config = require('./config');
 
+let headers = {
+  'Authorization': 'Token token=' + config.theme.token
+};
+
+function handle_response_error(res) {
+  switch (res.statusCode) {
+    case 404: {
+      gutil.log(gutil.log(gutil.colors.red('404 - Resource not found')));
+      break;
+    }
+    case 401: {
+      gutil.log(gutil.log(gutil.colors.red('401 - Resource Not Authorized')));
+      break;
+    }
+    case 500: {
+      gutil.log(gutil.log(gutil.colors.red('500 - Internal Server Error')));
+      break;
+    }
+  }
+}
+
 function upload_single(file, cb) {
   let key = file.path.replace(config.paths.base + config.paths.dist, '');
   let isBinary = file.path.match(/\.(gif|jpg|jpeg|png|svg)$/i);
@@ -25,6 +46,7 @@ function upload_single(file, cb) {
   request({
     uri: uri,
     method: 'PUT',
+    headers: headers,
     json: {
       school_id: config.theme.sandbox_school_id,
       key: key,
@@ -35,6 +57,9 @@ function upload_single(file, cb) {
   }, function (err, res) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green(`${key} uploaded successfully!`));
+    } else {
+      handle_response_error(res);
+      return;
     }
 
     if (cb && typeof cb === 'function') cb(err, file);
@@ -48,6 +73,7 @@ function update_theme(cb) {
   request({
     uri: uri,
     method: 'PUT',
+    headers: headers,
     json: {
       theme: {
         name: theme.name,
@@ -57,6 +83,9 @@ function update_theme(cb) {
   }, function (err, res) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green('Theme updated successfully!'));
+    } else {
+      handle_response_error(res);
+      return;
     }
 
     if (cb && typeof cb === 'function') cb(err);
@@ -87,6 +116,7 @@ function upload_all(files, cb) {
   request({
     uri: uri,
     method: 'PUT',
+    headers: headers,
     json: {
       school_id: config.theme.sandbox_school_id,
       assets: assets
@@ -95,7 +125,8 @@ function upload_all(files, cb) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green('All files uploaded successfully!'));
     } else {
-      console.log(body);
+      handle_response_error(res);
+      return;
     }
 
     update_theme(() => {
@@ -105,6 +136,8 @@ function upload_all(files, cb) {
 }
 
 function save_downloaded_asset(asset) {
+  if (!asset.key) return;
+
   let key = asset.key;
   let isImage = key.match(/\.(gif|jpg|jpeg|png)$/i);
   let isBinary = asset.src !== null;
@@ -119,6 +152,7 @@ function download_single(key, cb) {
   request({
     uri: uri,
     method: 'GET',
+    headers: headers,
     json: {
       school_id: config.theme.sandbox_school_id,
       key: key
@@ -129,6 +163,9 @@ function download_single(key, cb) {
 
     if (res.statusCode === 200) {
       gutil.log(gutil.colors.green(`${key} downloaded successfully!`));
+    } else {
+      handle_response_error(res);
+      return;
     }
 
     if (cb && typeof cb === 'function') cb(err);
@@ -141,6 +178,7 @@ function download_all(cb) {
   request({
     uri: uri,
     method: 'GET',
+    headers: headers,
     json: {
       school_id: config.theme.sandbox_school_id
     }
@@ -153,6 +191,9 @@ function download_all(cb) {
 
     if (res.statusCode === 200) {
       gutil.log(gutil.colors.green('All files downloaded successfully!'));
+    } else {
+      handle_response_error(res);
+      return;
     }
 
     if (cb && typeof cb === 'function') cb(err);

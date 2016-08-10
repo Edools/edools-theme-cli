@@ -57,6 +57,13 @@ exports.build = {
 
 exports.theme = require(exports.paths.base + 'theme.json');
 
+exports.isThemeConfigValid = () => {
+  return (exports.theme.sandbox_url &&
+  exports.theme.sandbox_theme_id &&
+  exports.theme.sandbox_school_id &&
+  exports.theme.token);
+};
+
 exports.wiredep = {
   exclude: [
     /\/bootstrap-sass\/.*\.js/

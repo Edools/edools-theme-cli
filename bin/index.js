@@ -4,14 +4,19 @@
 
 let program = require('commander');
 let gulp = require('gulp');
+let gutil = require('gulp-util');
 let fs = require('fs');
 let inquirer = require('inquirer');
 let utils = require('./utils');
 let pkg = require('../package.json');
 let config = require('./config');
 let wrench = require('wrench');
-let auth = require('./auth');
 let service = require('./service');
+
+if (!config.isThemeConfigValid()) {
+  gutil.log(gutil.colors.red('Invalid file "theme.json".'));
+  return;
+}
 
 /**
  *  This will load all js files in the tasks directory
@@ -77,7 +82,6 @@ function build() {
 }
 
 let cli = () => {
-  this.signin = auth.signin;
   this.create = create;
   this.serve = serve;
   this.upload = upload;
