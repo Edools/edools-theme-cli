@@ -1,6 +1,7 @@
 'use strict';
 
 let gutil = require('gulp-util');
+let path = require('path');
 let request = require('request');
 let fs = require('fs');
 let _ = require('lodash');
@@ -11,6 +12,15 @@ let config = require('./config');
 let headers = {
   'Authorization': 'Token token=' + config.theme.token
 };
+
+function ensureDirectoryExistence(filePath) {
+  var dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) {
+    return true;
+  }
+  ensureDirectoryExistence(dirname);
+  fs.mkdirSync(dirname);
+}
 
 function handle_response_error(res) {
   switch (res.statusCode) {
@@ -143,7 +153,11 @@ function save_downloaded_asset(asset) {
   let isBinary = asset.src !== null;
   let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
 
-  fs.writeFileSync(targetPath, asset.body, isBinary ? 'base64' : 'utf-8');
+  let tardetFilePath = path.join(config.paths.base, targetPath);
+
+  ensureDirectoryExistence(tardetFilePath);
+
+  fs.writeFileSync(tardetFilePath, asset.body, isBinary ? 'base64' : 'utf-8');
 }
 
 function download_single(key, cb) {
