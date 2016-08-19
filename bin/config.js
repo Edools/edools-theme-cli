@@ -108,8 +108,6 @@ if (!exports.isScssEnabled() || !exports.isBowerEnabled()) {
   assetRegex = assetRegex.replace(')))', '))(?!.*.min.*))');
 }
 
-console.log(assetRegex);
-
 exports.browser_sync = {
   open: true,
   files: [
