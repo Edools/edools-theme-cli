@@ -98,7 +98,7 @@ Builds theme's assets like scss, js and bower js files.
 
 Command: `edt build` or `edt b`
 
-### Upload Files to School
+#### Upload Files to School
 
 Uploads a single file or the entire theme if no file path provided.
 
@@ -109,7 +109,7 @@ Example: `edt u templates/index.liquid`
 ##### Warning: This command replaces the remote file, if you doesn't input a file path, all of the remote files will be overriden by local files.
 
 
-### Download Files to Local Folder
+#### Download Files to Local Folder
 
 Downloads a single file or the entire theme if no file path provided.
 
