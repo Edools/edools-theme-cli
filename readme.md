@@ -70,7 +70,15 @@ Creates an empty theme with basic configuration. You can use this command to sta
 
 Command: `edt init` or `edt i`
 
-Example: `mkdir my-theme && cd my-theme && edt i "My Theme" "Author Name"`
+Example: 
+
+```
+mkdir my-theme 
+
+cd my-theme 
+
+edt i "My Theme" "Author Name"
+```
 
 #### Serve
 
