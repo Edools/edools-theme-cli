@@ -4,7 +4,6 @@
 
 let program = require('commander');
 let gulp = require('gulp');
-let gutil = require('gulp-util');
 let fs = require('fs');
 let inquirer = require('inquirer');
 let utils = require('./utils');
@@ -12,11 +11,6 @@ let pkg = require('../package.json');
 let config = require('./config');
 let wrench = require('wrench');
 let service = require('./service');
-
-if (!config.isThemeConfigValid()) {
-  gutil.log(gutil.colors.red('Invalid file "theme.json".'));
-  return;
-}
 
 /**
  *  This will load all js files in the tasks directory
@@ -29,8 +23,21 @@ wrench.readdirSyncRecursive(__dirname + '/tasks')
   require('./tasks/' + file);
 });
 
-function create(name) {
-  //TODO: Clone a git repo thats have a base theme
+function init(name, author) {
+  let themeJson = {
+    "name": name,
+    "description": "put-your-theme-description-here",
+    "author": author || '',
+    "folder_name": name,
+    "sandbox_url": "https://myschool.com",
+    "sandbox_school_id": 0,
+    "sandbox_theme_id": 0,
+    "token": "put-your-token-here"
+  };
+
+  gulp.start('copy:init-templates');
+
+  fs.writeFileSync(config.paths.base + 'theme.json', JSON.stringify(themeJson, null, 2));
 }
 
 function serve() {
@@ -82,7 +89,7 @@ function build() {
 }
 
 let cli = () => {
-  this.create = create;
+  this.init = init;
   this.serve = serve;
   this.upload = upload;
   this.download = download;
@@ -97,10 +104,10 @@ let cli = () => {
    * Create Command
    */
   program
-    .command('create <name>')
-    .alias('c')
-    .description('Create a new Edools theme.')
-    .action(this.create);
+    .command('init <name> [author]>')
+    .alias('i')
+    .description('Start a new Edools theme.')
+    .action(this.init);
 
 
   /**
@@ -141,18 +148,6 @@ let cli = () => {
     .alias('b')
     .description('Build theme locally.')
     .action(this.build);
-
-
-  /**
-   * Signin Command
-   */
-  program
-    .command('signin')
-    .alias('si')
-    .description('Signin user.')
-    .option('e, --email <email>', 'User\'s email.')
-    .option('p, --password <password>', 'User\'s password.')
-    .action(this.signin);
 
   program.parse(process.argv);
 };

@@ -93,6 +93,7 @@ function update_theme(cb) {
   }, function (err, res) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green('Theme updated successfully!'));
+      config.theme = theme;
     } else {
       handle_response_error(res);
       return;

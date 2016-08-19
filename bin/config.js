@@ -1,10 +1,22 @@
 'use strict';
 
 let gutil = require('gulp-util');
+let path = require('path');
+let fs = require('fs');
 let _ = require('lodash');
+
+exports.fileExists = (filePath) => {
+  try {
+    return fs.statSync(filePath).isFile();
+  }
+  catch (err) {
+    return false;
+  }
+};
 
 exports.paths = {
   base: process.cwd() + '/',
+  appBase: __dirname,
   dist: 'dist/',
   assets: 'assets/',
   scss: 'assets/scss/',
@@ -55,13 +67,32 @@ exports.build = {
   css: 'theme.base.min.css'
 };
 
-exports.theme = require(exports.paths.base + 'theme.json');
+const themePath = exports.paths.base + 'theme.json';
+const cssCombPath = exports.paths.base + '.csscomb.json';
+const bowerJsonPath = exports.paths.base + 'bower.json';
+const scssMainPath = exports.paths.scss + 'theme.base.scss';
+
+exports.theme = exports.fileExists(themePath) ? require(themePath) : {};
+exports.cssCombConfig = exports.fileExists(cssCombPath) ? require(cssCombPath) : {};
 
 exports.isThemeConfigValid = () => {
-  return (exports.theme.sandbox_url &&
+  return (exports.theme &&
+  exports.theme.sandbox_url &&
   exports.theme.sandbox_theme_id &&
   exports.theme.sandbox_school_id &&
   exports.theme.token);
+};
+
+exports.isBowerEnabled = () => {
+  return exports.fileExists(bowerJsonPath);
+};
+
+exports.isScssEnabled = () => {
+  return exports.fileExists(scssMainPath);
+};
+
+exports.isCSSCombEnabled = () => {
+  return exports.fileExists(cssCombPath);
 };
 
 exports.wiredep = {
@@ -70,6 +101,14 @@ exports.wiredep = {
   ],
   directory: 'bower_components'
 };
+
+let assetRegex = "(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))";
+
+if (!exports.isScssEnabled() || !exports.isBowerEnabled()) {
+  assetRegex = assetRegex.replace(')))', '))(?!.*.min.*))');
+}
+
+console.log(assetRegex);
 
 exports.browser_sync = {
   open: true,
@@ -83,7 +122,7 @@ exports.browser_sync = {
   ghostMode: false,
   rewriteRules: [
     {
-      match: /(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))/g,
+      match: new RegExp(assetRegex, 'g'),
       replace: '/assets/'
     }
   ],

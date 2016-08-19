@@ -3,7 +3,7 @@
 let gulp = require('gulp');
 let $ = require('gulp-load-plugins')();
 let config = require('../config');
-let combConfig = require(config.paths.base + '.csscomb.json');
+let combConfig = config.cssCombConfig;
 let comb = new require('csscomb')(combConfig);
 
 gulp.task('scss', () => {

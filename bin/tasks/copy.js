@@ -17,3 +17,9 @@ gulp.task('copy:liquid', () => {
     .pipe(gulp.dest(config.paths.dist));
 });
 
+gulp.task('copy:init-templates', () => {
+  return gulp.src(config.paths.appBase + '/templates/**/*', {
+    dot: true
+  })
+    .pipe(gulp.dest(config.paths.base));
+});
