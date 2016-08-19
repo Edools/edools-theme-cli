@@ -106,6 +106,8 @@ Command: `edt upload` or `edt u`
 
 Example: `edt u templates/index.liquid`
 
+##### Warning: This command replaces the remote file, if you doesn't input a file path, all of the remote files will be overriden by local files.
+
 
 ### Download Files to Local Folder
 
@@ -114,6 +116,8 @@ Downloads a single file or the entire theme if no file path provided.
 Command: `edt download` or `edt d`
 
 Example: `edt d templates/index.liquid`
+
+##### Warning: This command replaces the local file, if you doesn't input a file path, all of the local files will be overriden by remote files.
 
 
 ### Development
