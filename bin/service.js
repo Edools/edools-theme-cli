@@ -132,7 +132,7 @@ function upload_all(files, cb) {
       school_id: config.theme.sandbox_school_id,
       assets: assets
     }
-  }, function (err, res, body) {
+  }, function (err, res) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green('All files uploaded successfully!'));
     } else {
