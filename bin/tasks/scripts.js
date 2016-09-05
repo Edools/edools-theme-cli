@@ -17,7 +17,8 @@ gulp.task('js:vendors', () => {
     }))
     .pipe($.concat(config.build.js_vendor))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(config.paths.dist + config.paths.assets));
+    .pipe(gulp.dest(config.paths.dist + config.paths.assets))
+    .pipe(gulp.dest(config.paths.compiled));
 });
 
 gulp.task('js', () => {
@@ -26,5 +27,6 @@ gulp.task('js', () => {
     .pipe($.uglify().on('error', config.errorHandler('uglify')))
     .pipe($.concat(config.build.js))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(config.paths.dist + config.paths.assets));
+    .pipe(gulp.dest(config.paths.dist + config.paths.assets))
+    .pipe(gulp.dest(config.paths.compiled));
 });

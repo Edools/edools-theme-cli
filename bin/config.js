@@ -18,6 +18,7 @@ exports.paths = {
   base: process.cwd() + '/',
   appBase: __dirname,
   dist: 'dist/',
+  compiled: 'assets/compiled/',
   assets: 'assets/',
   scss: 'assets/scss/',
   css: 'assets/css/',
