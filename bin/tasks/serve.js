@@ -21,7 +21,7 @@ gulp.task('serve', ['build'], () => {
     });
   }
 
-  gulp.watch(config.files.liquid.concat(config.files.json), ['copy:liquid']);
+  gulp.watch(config.files.liquid.concat(config.files.json).concat(config.files.fonts), ['copy:liquid']);
   gulp.watch(config.files.images, ['copy:images']);
   gulp.watch(config.files.js, ['js']);
   gulp.watch('bower.json', ['js:vendors']);

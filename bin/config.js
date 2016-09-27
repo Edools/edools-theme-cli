@@ -23,6 +23,7 @@ exports.paths = {
   scss: 'assets/scss/',
   css: 'assets/css/',
   js: 'assets/js/',
+  fonts: 'assets/fonts/',
   images: 'assets/images/',
   layouts: 'layouts/',
   snippets: 'snippets/',
@@ -49,13 +50,21 @@ exports.files = {
     exports.paths.js + 'components/**/*.js',
     exports.paths.js + 'main.js'
   ],
+  fonts: [
+    exports.paths.fonts + '**/*.ttf',
+    exports.paths.fonts + '**/*.eot',
+    exports.paths.fonts + '**/*.otf',
+    exports.paths.fonts + '**/*.woff',
+    exports.paths.fonts + '**/*.svg'
+  ],
   js_vendors: exports.paths.js + 'vendors/**/*.js',
   scss: exports.paths.scss + 'theme.base.scss',
   images: [
     exports.paths.images + '**/*.jpg',
     exports.paths.images + '**/*.jpeg',
     exports.paths.images + '**/*.png',
-    exports.paths.images + '**/*.gif'
+    exports.paths.images + '**/*.gif',
+    exports.paths.images + '**/*.svg'
   ],
   ignore_for_deploy: [
     '!**/*.map'

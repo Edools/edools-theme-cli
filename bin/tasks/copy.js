@@ -12,7 +12,8 @@ gulp.task('copy:images', () => {
 
 gulp.task('copy:liquid', () => {
   return gulp.src(config.files.liquid
-    .concat(config.files.json), {base: '.'})
+    .concat(config.files.json)
+    .concat(config.files.fonts), {base: '.'})
     .pipe($.changed(config.paths.dist))
     .pipe(gulp.dest(config.paths.dist));
 });
