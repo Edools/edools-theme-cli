@@ -88,12 +88,17 @@ function build() {
   gulp.start('build');
 }
 
+function deploy() {
+  gulp.start('deploy');
+}
+
 let cli = () => {
   this.init = init;
   this.serve = serve;
   this.upload = upload;
   this.download = download;
   this.build = build;
+  this.deploy = deploy;
 
   utils.log_events();
 
@@ -147,6 +152,14 @@ let cli = () => {
     .command('build')
     .alias('b')
     .description('Build theme locally.')
+    .action(this.deploy);
+
+  /**
+   * Deploy Command
+   */
+  program
+    .command('deploy')
+    .description('Deploy dist folder.')
     .action(this.build);
 
   program.parse(process.argv);
