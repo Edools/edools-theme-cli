@@ -59,6 +59,7 @@ exports.files = {
   ],
   js_vendors: exports.paths.js + 'vendors/**/*.js',
   scss: exports.paths.scss + 'theme.base.scss',
+  css: exports.paths.assets + '**/*.css',
   images: [
     exports.paths.images + '**/*.jpg',
     exports.paths.images + '**/*.jpeg',

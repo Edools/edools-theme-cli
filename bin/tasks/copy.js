@@ -18,6 +18,13 @@ gulp.task('copy:liquid', () => {
     .pipe(gulp.dest(config.paths.dist));
 });
 
+
+gulp.task('copy:css', () => {
+  return gulp.src(config.files.css)
+    .pipe($.changed(config.paths.dist + '/' + config.paths.assets))
+    .pipe(gulp.dest(config.paths.dist + '/' + config.paths.assets));
+});
+
 gulp.task('copy:init-templates', () => {
   return gulp.src(config.paths.appBase + '/templates/**/*', {
     dot: true

@@ -7,6 +7,7 @@ let runSequence = require('run-sequence');
 gulp.task('build', (cb) => {
   let tasks = [
     'js',
+    'copy:css',
     'copy:liquid',
     'copy:images'];
 
