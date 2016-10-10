@@ -14,6 +14,10 @@ gulp.task('scss', () => {
     }).on('error', $.sass.logError))
     .pipe($.concat(config.build.css))
     .pipe($.stripCssComments())
+    .pipe($.autoprefixer({
+      browsers: ['last 2 versions'],
+      cascade: false
+    }))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest(config.paths.dist + config.paths.assets))
     .pipe(gulp.dest(config.paths.compiled));
