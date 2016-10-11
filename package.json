@@ -1,7 +1,7 @@
 {
   "name": "edools-theme-cli",
   "description": "A starter kit to make Edools Themes",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "main": "index",
   "bin": {
     "edools-theme": "./bin/index.js",
