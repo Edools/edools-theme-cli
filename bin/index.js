@@ -89,7 +89,7 @@ function build() {
 }
 
 function deploy() {
-  gulp.start('deploy');
+  gulp.start('deploy:withou_build');
 }
 
 let cli = () => {
@@ -160,7 +160,7 @@ let cli = () => {
   program
     .command('deploy')
     .description('Deploy dist folder.')
-    .action(this.build);
+    .action(this.deploy);
 
   program.parse(process.argv);
 };

@@ -11,3 +11,10 @@ gulp.task('deploy', ['build'], (cb) => {
 
   sync.upload_all(files, cb);
 });
+
+gulp.task('deploy:withou_build', (cb) => {
+  let files = glob.sync([config.paths.dist + '**/*.*']
+    .concat(config.files.ignore_for_deploy));
+
+  sync.upload_all(files, cb);
+});

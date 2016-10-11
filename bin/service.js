@@ -36,6 +36,9 @@ function handle_response_error(res) {
       gutil.log(gutil.log(gutil.colors.red('500 - Internal Server Error')));
       break;
     }
+    default: {
+      gutil.log(gutil.log(gutil.colors.red('Response Status: ' + res.statusCode)));
+    }
   }
 }
 
@@ -106,7 +109,7 @@ function update_theme(cb) {
 function upload_all(files, cb) {
   let assets = _.map(files, (file) => {
     let key = file.replace(config.paths.dist, '');
-    let isBinary = file.match(/\.(gif|jpg|jpeg|png)$/i);
+    let isBinary = file.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
     let fileContents = fs.readFileSync(file, !isBinary ? {
       encoding: 'utf-8'
