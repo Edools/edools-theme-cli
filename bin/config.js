@@ -114,11 +114,25 @@ exports.wiredep = {
   directory: 'bower_components'
 };
 
-let assetRegex = "(\/\/(.*)\/e\/files\/(.*)[0-9]\/)((?!.*theme.js)(?!.*theme.scss)(?!.*.(png|jpg|jpeg|gif)))";
+let assetRegex = "" +
+  "(" +
+  "(\/\/(.*)\/e\/files\/(.*)[0-9]\/)" + // Dev
+  "|" +
+  "(https\:\/\/s3\.amazonaws\.\com\/core_development\/(.*)\/assets\/)" + // Dev
+  "|" +
+  "(https\:\/\/edools\-3\-staging\.s3\.amazonaws\.com\/(.*)\/assets\/)" + // Staging
+  "|" +
+  "(https\:\/\/static\-cdn\.myedools\.com\/(.*)\/assets\/)" + // Production
+  ")" +
+  "((?!.*theme.js)" +
+  "(?!.*theme.scss)" +
+  "(?!.*.(png|jpg|jpeg|gif)))";
 
 if (!exports.isScssEnabled() || !exports.isBowerEnabled()) {
   assetRegex = assetRegex.replace(')))', '))(?!.*.min.*))');
 }
+
+console.log(assetRegex);
 
 exports.browser_sync = {
   open: true,
