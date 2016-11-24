@@ -20,13 +20,19 @@ gulp.task('copy:liquid', () => {
 
 
 gulp.task('copy:css', () => {
-  return gulp.src(config.files.css)
+  return gulp.src([
+    config.files.css,
+    '!' + config.paths.assets + 'compiled/**.*.*'
+  ])
     .pipe($.changed(config.paths.dist + '/' + config.paths.assets))
     .pipe(gulp.dest(config.paths.dist + '/' + config.paths.assets));
 });
 
 gulp.task('copy:minJs', () => {
-  return gulp.src(config.files.minJs)
+  return gulp.src([
+    config.files.minJs,
+    '!' + config.paths.assets + 'compiled/**.*.*'
+  ])
     .pipe($.changed(config.paths.dist + '/' + config.paths.assets))
     .pipe(gulp.dest(config.paths.dist + '/' + config.paths.assets));
 });

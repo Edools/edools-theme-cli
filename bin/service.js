@@ -201,13 +201,15 @@ function download_all(cb) {
       school_id: config.theme.sandbox_school_id
     }
   }, function (err, res) {
-    let assets = res.body;
+    console.log(err);
 
-    _.each(assets, asset => {
-      save_downloaded_asset(asset);
-    });
+    if (!err && res && res.statusCode === 200) {
+      let assets = res.body;
 
-    if (res.statusCode === 200) {
+      _.each(assets, asset => {
+        save_downloaded_asset(asset);
+      });
+
       gutil.log(gutil.colors.green('All files downloaded successfully!'));
     } else {
       handle_response_error(res);
