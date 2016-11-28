@@ -124,15 +124,14 @@ let assetRegex = "" +
   "|" +
   "(https\:\/\/static\-cdn\.myedools\.com\/(.*)\/assets\/)" + // Production
   ")" +
-  "((?!.*theme.js)" +
-  "(?!.*theme.scss)" +
-  "(?!.*.(png|jpg|jpeg|gif)))";
+  "(\.(.*)\.(css|js))" +
+  "(?!.*theme.js)" +
+  "(?!.*theme.scss.css)" +
+  "(?!.*.(png|jpg|jpeg|gif))";
 
 if (!exports.isScssEnabled() || !exports.isBowerEnabled()) {
   assetRegex = assetRegex.replace(')))', '))(?!.*.min.*))');
 }
-
-console.log(assetRegex);
 
 exports.browser_sync = {
   open: true,
@@ -147,7 +146,17 @@ exports.browser_sync = {
   rewriteRules: [
     {
       match: new RegExp(assetRegex, 'g'),
-      replace: '/assets/'
+      fn: (req, res, match) => {
+        if (match.indexOf('/assets/assets/') <= -1) return match;
+
+        match = match.split('/assets/assets/')[1];
+
+        let splited = match.split('.');
+        return '/assets/' + splited
+            .filter((x) => {
+              return isNaN(x);
+            }).join('.');
+      }
     }
   ],
   snippetOptions: {
