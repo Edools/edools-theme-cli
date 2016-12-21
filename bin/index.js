@@ -29,10 +29,12 @@ function init(name, author) {
     "description": "put-your-theme-description-here",
     "author": author || '',
     "folder_name": name,
-    "sandbox_url": "https://myschool.com",
-    "sandbox_school_id": 0,
-    "sandbox_theme_id": 0,
-    "token": "put-your-token-here"
+    "development": {
+      "url": "https://myschool.com",
+      "school_id": 0,
+      "theme_id": 0,
+      "token": "put-your-token-here"
+    }
   };
 
   gulp.start('copy:init-templates');
@@ -55,7 +57,7 @@ function upload(file) {
       }
     ]).then((res) => {
       // upload all files
-      if (res.ok === true) gulp.start('deploy');
+      if (res.ok === true) gulp.start('deploy:development');
     });
   } else {
     // upload single file
@@ -88,8 +90,8 @@ function build() {
   gulp.start('build');
 }
 
-function deploy() {
-  gulp.start('deploy:withou_build');
+function deploy(env) {
+  gulp.start('deploy:' + env);
 }
 
 let cli = () => {
@@ -152,14 +154,14 @@ let cli = () => {
     .command('build')
     .alias('b')
     .description('Build theme locally.')
-    .action(this.deploy);
+    .action(this.build);
 
   /**
    * Deploy Command
    */
   program
-    .command('deploy')
-    .description('Deploy dist folder.')
+    .command('deploy <env>')
+    .description('Deploy theme to production or staging enviroments, you\'ll need the CLI App Token')
     .action(this.deploy);
 
   program.parse(process.argv);

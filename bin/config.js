@@ -3,6 +3,7 @@
 let gutil = require('gulp-util');
 let path = require('path');
 let fs = require('fs');
+let url = require('url');
 let _ = require('lodash');
 
 exports.fileExists = (filePath) => {
@@ -89,10 +90,22 @@ exports.cssCombConfig = exports.fileExists(cssCombPath) ? require(cssCombPath) :
 
 exports.isThemeConfigValid = () => {
   return (exports.theme &&
-  exports.theme.sandbox_url &&
+  (exports.theme.sandbox_url &&
   exports.theme.sandbox_theme_id &&
   exports.theme.sandbox_school_id &&
-  exports.theme.token);
+  exports.theme.token) ||
+  (exports.theme.development &&
+  exports.theme.development.theme_id &&
+  exports.theme.development.school_id &&
+  exports.theme.development.token) ||
+  (exports.theme.staging &&
+  exports.theme.staging.theme_id &&
+  exports.theme.staging.school_id &&
+  exports.theme.staging.token) ||
+  (exports.theme.production &&
+  exports.theme.production.theme_id &&
+  exports.theme.production.school_id &&
+  exports.theme.production.token));
 };
 
 exports.isBowerEnabled = () => {
@@ -105,6 +118,29 @@ exports.isScssEnabled = () => {
 
 exports.isCSSCombEnabled = () => {
   return exports.fileExists(cssCombPath);
+};
+
+exports.getSchoolUrl = (env, path) => {
+  env = env || 'development';
+
+  let themeId = exports.theme.sandbox_theme_id || exports.theme[env].theme_id;
+  let apiUrl = exports.theme.sandbox_url || exports.theme[env].url;
+
+  return url.resolve(apiUrl, '/api/themes/' + themeId + path);
+};
+
+exports.getDefaultRequestHeaders = (env) => {
+  env = env || 'development';
+
+  return {
+    'Authorization': 'Token token=' + (exports.theme.token || exports.theme[env].token)
+  };
+};
+
+exports.getSchoolId = (env) => {
+  env = env || 'development';
+
+  return exports.theme.sandbox_school_id || exports.theme[env].school_id;
 };
 
 exports.wiredep = {
@@ -140,7 +176,7 @@ exports.browser_sync = {
     exports.paths.dist + exports.paths.assets + '*.js'
   ],
   serveStatic: [exports.paths.dist],
-  proxy: exports.theme.sandbox_url,
+  proxy: exports.theme.sandbox_url || exports.theme.development.url,
   port: 5000,
   ghostMode: false,
   rewriteRules: [

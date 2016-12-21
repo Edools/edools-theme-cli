@@ -5,19 +5,16 @@ let path = require('path');
 let request = require('request');
 let fs = require('fs');
 let _ = require('lodash');
-let url = require('url');
 let through = require('through2');
 let config = require('./config');
 
-let headers = {
-  'Authorization': 'Token token=' + config.theme.token
-};
-
 function ensureDirectoryExistence(filePath) {
   var dirname = path.dirname(filePath);
+
   if (fs.existsSync(dirname)) {
     return true;
   }
+
   ensureDirectoryExistence(dirname);
   fs.mkdirSync(dirname);
 }
@@ -42,7 +39,22 @@ function handle_response_error(res) {
   }
 }
 
-function upload_single(file, cb) {
+function save_downloaded_asset(asset) {
+  if (!asset.key) return;
+
+  let key = asset.key;
+  let isImage = key.match(/\.(gif|jpg|jpeg|png)$/i);
+  let isBinary = asset.src !== null;
+  let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
+
+  let tardetFilePath = path.join(config.paths.base, targetPath);
+
+  ensureDirectoryExistence(tardetFilePath);
+
+  fs.writeFileSync(tardetFilePath, asset.body, isBinary ? 'base64' : 'utf-8');
+}
+
+function upload_single(file, cb, env) {
   let key = file.path.replace(config.paths.base + config.paths.dist, '');
   let isBinary = file.path.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
@@ -54,14 +66,14 @@ function upload_single(file, cb) {
     fileContents = new Buffer(fileContents).toString('base64');
   }
 
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/' + key);
+  let uri = config.getSchoolUrl(env, '/sync/' + key);
 
   request({
     uri: uri,
     method: 'PUT',
-    headers: headers,
+    headers: config.getDefaultRequestHeaders(env),
     json: {
-      school_id: config.theme.sandbox_school_id,
+      school_id: config.getSchoolId(env),
       key: key,
       asset: {
         body: fileContents
@@ -79,17 +91,18 @@ function upload_single(file, cb) {
   });
 }
 
-function update_theme(cb) {
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/update_theme');
+function update_theme(cb, env) {
+  let uri = config.getSchoolUrl(env, '/sync/update_theme');
   let theme = JSON.parse(fs.readFileSync(config.paths.base + 'theme.json'));
 
   request({
     uri: uri,
     method: 'PUT',
-    headers: headers,
+    headers: config.getDefaultRequestHeaders(env),
     json: {
       theme: {
         name: theme.name,
+        author: theme.author,
         description: theme.description
       }
     }
@@ -106,7 +119,7 @@ function update_theme(cb) {
   });
 }
 
-function upload_all(files, cb) {
+function upload_all(files, cb, env) {
   let assets = _.map(files, (file) => {
     let key = file.replace(config.paths.dist, '');
     let isBinary = file.match(/\.(gif|jpg|jpeg|png|svg)$/i);
@@ -125,16 +138,21 @@ function upload_all(files, cb) {
     };
   });
 
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/batch');
+  let uri = config.getSchoolUrl(env, '/sync/batch');
+
+  let data = {
+    assets: assets
+  };
+
+  if (env == 'development') {
+    data.school_id = config.getSchoolId(env);
+  }
 
   request({
     uri: uri,
     method: 'PUT',
-    headers: headers,
-    json: {
-      school_id: config.theme.sandbox_school_id,
-      assets: assets
-    }
+    headers: config.getDefaultRequestHeaders(env),
+    json: data
   }, function (err, res) {
     if (res.statusCode === 204) {
       gutil.log(gutil.colors.green('All files uploaded successfully!'));
@@ -149,30 +167,15 @@ function upload_all(files, cb) {
   });
 }
 
-function save_downloaded_asset(asset) {
-  if (!asset.key) return;
-
-  let key = asset.key;
-  let isImage = key.match(/\.(gif|jpg|jpeg|png)$/i);
-  let isBinary = asset.src !== null;
-  let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
-
-  let tardetFilePath = path.join(config.paths.base, targetPath);
-
-  ensureDirectoryExistence(tardetFilePath);
-
-  fs.writeFileSync(tardetFilePath, asset.body, isBinary ? 'base64' : 'utf-8');
-}
-
-function download_single(key, cb) {
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/' + key);
+function download_single(key, cb, env) {
+  let uri = config.getSchoolUrl(env, '/sync/' + key);
 
   request({
     uri: uri,
     method: 'GET',
-    headers: headers,
+    headers: config.getDefaultRequestHeaders(env),
     json: {
-      school_id: config.theme.sandbox_school_id,
+      school_id: config.getSchoolId(env),
       key: key
     }
   }, function (err, res) {
@@ -190,15 +193,15 @@ function download_single(key, cb) {
   });
 }
 
-function download_all(cb) {
-  let uri = url.resolve(config.theme.sandbox_url, '/api/themes/' + config.theme.sandbox_theme_id + '/sync/');
+function download_all(cb, env) {
+  let uri = config.getSchoolUrl(env, '/sync/');
 
   request({
     uri: uri,
     method: 'GET',
-    headers: headers,
+    headers: config.getDefaultRequestHeaders(env),
     json: {
-      school_id: config.theme.sandbox_school_id
+      school_id: config.getSchoolId(env)
     }
   }, function (err, res) {
     console.log(err);
@@ -220,7 +223,7 @@ function download_all(cb) {
   });
 }
 
-let upload_single_stream = through.obj((file, enc, callback) => {
+const upload_single_stream = through.obj((file, enc, callback) => {
   upload_single(file, (err, file) => {
     callback(err, file);
   });
