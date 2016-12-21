@@ -22,19 +22,19 @@ function ensureDirectoryExistence(filePath) {
 function handle_response_error(res) {
   switch (res.statusCode) {
     case 404: {
-      gutil.log(gutil.log(gutil.colors.red('404 - Resource not found')));
+      gutil.log(gutil.colors.red('404 - Resource not found'));
       break;
     }
     case 401: {
-      gutil.log(gutil.log(gutil.colors.red('401 - Resource Not Authorized')));
+      gutil.log(gutil.colors.red('401 - Resource Not Authorized'));
       break;
     }
     case 500: {
-      gutil.log(gutil.log(gutil.colors.red('500 - Internal Server Error')));
+      gutil.log(gutil.colors.red('500 - Internal Server Error'));
       break;
     }
     default: {
-      gutil.log(gutil.log(gutil.colors.red('Response Status: ' + res.statusCode)));
+      gutil.log(gutil.colors.red('Response Status: ' + res.statusCode));
     }
   }
 }

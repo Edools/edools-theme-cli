@@ -5,7 +5,10 @@
 let program = require('commander');
 let gulp = require('gulp');
 let fs = require('fs');
+let path = require('path');
+let gutil = require('gulp-util');
 let inquirer = require('inquirer');
+let git = require('simple-git');
 let utils = require('./utils');
 let pkg = require('../package.json');
 let config = require('./config');
@@ -91,7 +94,24 @@ function build() {
 }
 
 function deploy(env) {
-  gulp.start('deploy:' + env);
+  let git = require('simple-git')(config.paths.base);
+
+  git.status((err, res) => {
+    let branch = res.current;
+    let modified = res.files.length > 0;
+
+    if ((env == 'staging' && branch != 'dev') || (env == 'production' && branch != 'master')) {
+      gutil.log(gutil.colors.red('You cannot deploy from branch "' + branch + '", you can only deploy from "dev" for staging or "master" for production.'));
+      return;
+    }
+
+    if (modified === true) {
+      gutil.log(gutil.colors.red('You have modified files in your current branch, please commit and push before deploy.'));
+      return;
+    }
+
+    gulp.start('deploy:' + env);
+  });
 }
 
 let cli = () => {
