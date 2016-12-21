@@ -144,7 +144,7 @@ function upload_all(files, cb, env) {
     assets: assets
   };
 
-  if (env == 'development') {
+  if (env === 'development') {
     data.school_id = config.getSchoolId(env);
   }
 
