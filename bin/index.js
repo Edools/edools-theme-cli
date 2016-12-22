@@ -5,7 +5,10 @@
 let program = require('commander');
 let gulp = require('gulp');
 let fs = require('fs');
+let path = require('path');
+let gutil = require('gulp-util');
 let inquirer = require('inquirer');
+let git = require('simple-git');
 let utils = require('./utils');
 let pkg = require('../package.json');
 let config = require('./config');
@@ -29,10 +32,12 @@ function init(name, author) {
     "description": "put-your-theme-description-here",
     "author": author || '',
     "folder_name": name,
-    "sandbox_url": "https://myschool.com",
-    "sandbox_school_id": 0,
-    "sandbox_theme_id": 0,
-    "token": "put-your-token-here"
+    "development": {
+      "url": "https://myschool.com",
+      "school_id": 0,
+      "theme_id": 0,
+      "token": "put-your-token-here"
+    }
   };
 
   gulp.start('copy:init-templates');
@@ -55,7 +60,7 @@ function upload(file) {
       }
     ]).then((res) => {
       // upload all files
-      if (res.ok === true) gulp.start('deploy');
+      if (res.ok === true) gulp.start('deploy:development');
     });
   } else {
     // upload single file
@@ -88,8 +93,25 @@ function build() {
   gulp.start('build');
 }
 
-function deploy() {
-  gulp.start('deploy:withou_build');
+function deploy(env) {
+  let git = require('simple-git')(config.paths.base);
+
+  git.status((err, res) => {
+    let branch = res.current;
+    let modified = res.files.length > 0;
+
+    if ((env == 'staging' && branch != 'dev') || (env == 'production' && branch != 'master')) {
+      gutil.log(gutil.colors.red('You cannot deploy from branch "' + branch + '", you can only deploy from "dev" for staging or "master" for production.'));
+      return;
+    }
+
+    if (modified === true) {
+      gutil.log(gutil.colors.red('You have modified files in your current branch, please commit and push before deploy.'));
+      return;
+    }
+
+    gulp.start('deploy:' + env);
+  });
 }
 
 let cli = () => {
@@ -152,14 +174,14 @@ let cli = () => {
     .command('build')
     .alias('b')
     .description('Build theme locally.')
-    .action(this.deploy);
+    .action(this.build);
 
   /**
    * Deploy Command
    */
   program
-    .command('deploy')
-    .description('Deploy dist folder.')
+    .command('deploy <env>')
+    .description('Deploy theme to production or staging enviroments, you\'ll need the CLI App Token')
     .action(this.deploy);
 
   program.parse(process.argv);
