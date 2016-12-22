@@ -123,7 +123,7 @@ exports.isCSSCombEnabled = () => {
 exports.getSchoolUrl = (env, path) => {
   env = env || 'development';
 
-  if (!exports.isThemeConfigValid || !exports.theme.sandbox_theme_id || !exports.theme[env]) {
+  if (!exports.isThemeConfigValid() && !exports.theme.sandbox_theme_id && !exports.theme[env]) {
     gutil.log(gutil.colors.red('Your theme.json file is invalid, please check if you have all needed information in theme.json file.'));
     throw '';
   }
