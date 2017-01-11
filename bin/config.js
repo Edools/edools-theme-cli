@@ -181,7 +181,7 @@ exports.browser_sync = {
     exports.paths.dist + exports.paths.assets + '*.js'
   ],
   serveStatic: [exports.paths.dist],
-  proxy: exports.theme.sandbox_url || exports.theme.development.url,
+  proxy: exports.theme.sandbox_url || exports.theme.development ? exports.theme.development.url : '',
   port: 5000,
   ghostMode: false,
   rewriteRules: [
