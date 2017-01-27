@@ -19,31 +19,43 @@ function ensureDirectoryExistence(filePath) {
   fs.mkdirSync(dirname);
 }
 
-function handle_response_error(res) {
-  switch (res.statusCode) {
-    case 404: {
-      gutil.log(gutil.colors.red('404 - Resource not found'));
-      break;
+function handle_response_error(err, res) {
+  if (err) {
+    msg = err;
+    if (typeof msg != 'string') {
+      msg = JSON.stringify(msg, null, 2);
     }
-    case 401: {
-      gutil.log(gutil.colors.red('401 - Resource Not Authorized'));
-      break;
-    }
-    case 500: {
-      gutil.log(gutil.colors.red('500 - Internal Server Error'));
-      break;
-    }
-    default: {
-      gutil.log(gutil.colors.red('Response Status: ' + res.statusCode));
+
+    gutil.log(gutil.colors.red(msg));
+  }
+  if (res) {
+    switch (res.statusCode) {
+      case 404: {
+        gutil.log(gutil.colors.red('404 - Resource not found'));
+        break;
+      }
+      case 401: {
+        gutil.log(gutil.colors.red('401 - Resource Not Authorized'));
+        break;
+      }
+      case 500: {
+        gutil.log(gutil.colors.red('500 - Internal Server Error'));
+        break;
+      }
+      default: {
+        gutil.log(gutil.colors.red('Response Status: ' + res.statusCode));
+      }
     }
   }
 }
 
 function save_downloaded_asset(asset) {
-  if (!asset.key) return;
+  if (!asset.key || (config.isBowerEnabled() && asset.key.indexOf('theme.base.') != -1)) {
+    return
+  }
 
   let key = asset.key;
-  let isImage = key.match(/\.(gif|jpg|jpeg|png)$/i);
+  let isImage = key.match(/\.(gif|jpg|jpeg|png|svg)$/i);
   let isBinary = asset.src !== null;
   let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
 
@@ -59,8 +71,8 @@ function upload_single(file, cb, env) {
   let isBinary = file.path.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
   let fileContents = fs.readFileSync(file.path, !isBinary ? {
-    encoding: 'utf-8'
-  } : null);
+      encoding: 'utf-8'
+    } : null);
 
   if (isBinary) {
     fileContents = new Buffer(fileContents).toString('base64');
@@ -80,10 +92,10 @@ function upload_single(file, cb, env) {
       }
     }
   }, function (err, res) {
-    if (res.statusCode === 204) {
+    if (!err && res && res.statusCode === 204) {
       gutil.log(gutil.colors.green(`${key} uploaded successfully!`));
     } else {
-      handle_response_error(res);
+      handle_response_error(err, res);
       return;
     }
 
@@ -107,11 +119,11 @@ function update_theme(cb, env) {
       }
     }
   }, function (err, res) {
-    if (res.statusCode === 204) {
+    if (!err && res && res.statusCode === 204) {
       gutil.log(gutil.colors.green('Theme updated successfully!'));
       config.theme = theme;
     } else {
-      handle_response_error(res);
+      handle_response_error(err, res);
       return;
     }
 
@@ -125,8 +137,8 @@ function upload_all(files, cb, env) {
     let isBinary = file.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
     let fileContents = fs.readFileSync(file, !isBinary ? {
-      encoding: 'utf-8'
-    } : null);
+        encoding: 'utf-8'
+      } : null);
 
     if (isBinary) {
       fileContents = new Buffer(fileContents).toString('base64');
@@ -154,10 +166,10 @@ function upload_all(files, cb, env) {
     headers: config.getDefaultRequestHeaders(env),
     json: data
   }, function (err, res) {
-    if (res.statusCode === 204) {
+    if (!err && res && res.statusCode === 204) {
       gutil.log(gutil.colors.green('All files uploaded successfully!'));
     } else {
-      handle_response_error(res);
+      handle_response_error(err, res);
       return;
     }
 
@@ -182,10 +194,10 @@ function download_single(key, cb, env) {
 
     save_downloaded_asset(res.body);
 
-    if (res.statusCode === 200) {
+    if (!err && res && res.statusCode === 200) {
       gutil.log(gutil.colors.green(`${key} downloaded successfully!`));
     } else {
-      handle_response_error(res);
+      handle_response_error(err, res);
       return;
     }
 
@@ -204,8 +216,6 @@ function download_all(cb, env) {
       school_id: config.getSchoolId(env)
     }
   }, function (err, res) {
-    console.log(err);
-
     if (!err && res && res.statusCode === 200) {
       let assets = res.body;
 
@@ -215,7 +225,7 @@ function download_all(cb, env) {
 
       gutil.log(gutil.colors.green('All files downloaded successfully!'));
     } else {
-      handle_response_error(res);
+      handle_response_error(err, res);
       return;
     }
 
