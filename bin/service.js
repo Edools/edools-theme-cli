@@ -21,7 +21,7 @@ function ensureDirectoryExistence(filePath) {
 
 function handle_response_error(err, res) {
   if (err) {
-    msg = err;
+    let msg = err;
     if (typeof msg != 'string') {
       msg = JSON.stringify(msg, null, 2);
     }
