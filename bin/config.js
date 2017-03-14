@@ -15,6 +15,8 @@ exports.fileExists = (filePath) => {
   }
 };
 
+exports.binaryFileTypes = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
+
 exports.paths = {
   base: process.cwd() + '/',
   appBase: __dirname,
@@ -31,7 +33,9 @@ exports.paths = {
   templates: 'templates/',
   mailers: 'mailers/',
   config: 'config/',
-  locales: 'locales/'
+  locales: 'locales/',
+  hashes: 'hashes/',
+  sms: 'sms/'
 };
 
 exports.files = {
@@ -41,7 +45,9 @@ exports.files = {
     exports.paths.snippets + '**/*.liquid',
     exports.paths.templates + '**/*.liquid',
     exports.paths.layouts + '**/*.liquid',
-    exports.paths.mailers + '**/*.liquid'
+    exports.paths.mailers + '**/*.liquid',
+    exports.paths.hashes + '**/*.liquid',
+    exports.paths.sms + '**/*.liquid'
   ],
   json: [
     exports.paths.config + '**/*.json',
@@ -62,17 +68,15 @@ exports.files = {
   scss: exports.paths.scss + 'theme.base.scss',
   css: exports.paths.assets + '**/*.css',
   minJs: exports.paths.assets + '**/*.min.js',
-  images: [
-    exports.paths.images + '**/*.jpg',
-    exports.paths.images + '**/*.jpeg',
-    exports.paths.images + '**/*.png',
-    exports.paths.images + '**/*.gif',
-    exports.paths.images + '**/*.svg'
-  ],
   ignore_for_deploy: [
     '!**/*.map'
   ]
 };
+
+exports.files['images'] = exports.binaryFileTypes.map((t) => {
+  return `${exports.paths.images}**/*.${t}`;
+});
+
 
 exports.build = {
   js: 'theme.base.min.js',
