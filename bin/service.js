@@ -134,8 +134,9 @@ function update_theme(cb, env) {
 function upload_all(files, cb, env) {
   let assets = _.map(files, (file) => {
     let key = file.replace(config.paths.dist, '');
-    let isBinary = file.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
+    let binaryFiles = config.binaryFileTypes.join('|');
+    let isBinary = file.match(new RegExp(`\.(${binaryFiles})$`, 'i'));
     let fileContents = fs.readFileSync(file, !isBinary ? {
         encoding: 'utf-8'
       } : null);
