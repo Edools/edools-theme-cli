@@ -7,6 +7,7 @@ let fs = require('fs');
 let _ = require('lodash');
 let through = require('through2');
 let config = require('./config');
+let url = require('url');
 
 function ensureDirectoryExistence(filePath) {
   var dirname = path.dirname(filePath);
@@ -17,6 +18,25 @@ function ensureDirectoryExistence(filePath) {
 
   ensureDirectoryExistence(dirname);
   fs.mkdirSync(dirname);
+}
+
+function is_protected_theme(cb) {
+  let uri = config.theme.sandbox_url || config.theme.development.url;
+  uri = url.resolve(uri, '/themes/params');
+
+  request({
+    uri: uri,
+    method: 'GET',
+  }, function (err, res) {
+    if (err) {
+      handle_response_error(err, res);
+      return;
+    }
+
+    let json = JSON.parse(res.body);
+
+    if (cb && typeof cb === 'function') cb(json.school.theme_protected);
+  });
 }
 
 function handle_response_error(err, res) {
@@ -192,10 +212,8 @@ function download_single(key, cb, env) {
       key: key
     }
   }, function (err, res) {
-
-    save_downloaded_asset(res.body);
-
     if (!err && res && res.statusCode === 200) {
+      save_downloaded_asset(res.body);
       gutil.log(gutil.colors.green(`${key} downloaded successfully!`));
     } else {
       handle_response_error(err, res);
@@ -245,4 +263,5 @@ exports.upload_all = upload_all;
 exports.update_theme = update_theme;
 exports.download_single = download_single;
 exports.download_all = download_all;
+exports.is_protected_theme = is_protected_theme;
 exports.upload_single_stream = upload_single_stream;

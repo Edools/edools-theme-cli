@@ -46,28 +46,40 @@ function init(name, author) {
 }
 
 function serve() {
-  gulp.start('serve');
+  service.is_protected_theme((isProtected) => {
+    if (isProtected != true) {
+      gulp.start('serve');
+    } else {
+      gutil.log(gutil.colors.red('This theme is protected, you can\'t live edit protected themes!'));
+    }
+  });
 }
 
 function upload(file) {
-  if (!file || !fs.statSync(file).isFile()) {
-    inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'ok',
-        message: 'You did not enter the file path, if you decide to proceed, all of the server\'s files will be overriden by local files. Do you want to upload all files?',
-        default: 'n'
+  service.is_protected_theme((isProtected) => {
+    if (isProtected != true) {
+      if (!file || !fs.statSync(file).isFile()) {
+        inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'ok',
+            message: 'You did not enter the file path, if you decide to proceed, all of the server\'s files will be overriden by local files. Do you want to upload all files?',
+            default: 'n'
+          }
+        ]).then((res) => {
+          // upload all files
+          if (res.ok === true) gulp.start('deploy:development');
+        });
+      } else {
+        // upload single file
+        service.upload_single({
+          path: file
+        });
       }
-    ]).then((res) => {
-      // upload all files
-      if (res.ok === true) gulp.start('deploy:development');
-    });
-  } else {
-    // upload single file
-    service.upload_single({
-      path: file
-    });
-  }
+    } else {
+      gutil.log(gutil.colors.red('This theme is protected, you can\'t upload files to protected themes. Please use deploy command!'));
+    }
+  });
 }
 
 function download(file) {
