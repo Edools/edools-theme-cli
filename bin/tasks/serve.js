@@ -13,21 +13,20 @@ gulp.task('serve', ['build'], () => {
 
   browserSync.init(config.browser_sync);
 
-  gulp.watch(config.paths.scss + '**/*.scss', ['scss']);
-
-  if (config.isCSSCombEnabled()) {
-    gulp.watch(config.paths.scss + '**/*.scss').on('change', function (file) {
-      comb.processFile(file.path);
+  gulp.watch(config.paths.scss + '**/*.scss', {cwd: './'}, ['scss'])
+    .on('change', function (file) {
+      if (config.isCSSCombEnabled()) {
+        comb.processFile(file.path);
+      }
     });
-  }
 
-  gulp.watch(config.files.liquid.concat(config.files.json).concat(config.files.fonts), ['copy:liquid']);
-  gulp.watch(config.files.images, ['copy:images']);
-  gulp.watch(config.files.js, ['js']);
-  gulp.watch('bower.json', ['js:vendors']);
+  gulp.watch(config.files.liquid.concat(config.files.json).concat(config.files.fonts), {cwd: './'}, ['copy:liquid']);
+  gulp.watch(config.files.images, {cwd: './'}, ['copy:images']);
+  gulp.watch(config.files.js, {cwd: './'}, ['js']);
+  gulp.watch('bower.json', {cwd: './'}, ['js:vendors']);
 
   gulp.watch([config.paths.dist + '**/*.*']
-    .concat(config.files.ignore_for_deploy))
+    .concat(config.files.ignore_for_deploy), {cwd: './'})
     .on('change', function (file) {
       if (fs.lstatSync(file.path).isDirectory()) return;
       sync.upload_single(file, (err, f) => {
@@ -39,7 +38,7 @@ gulp.task('serve', ['build'], () => {
       });
     });
 
-  gulp.watch(config.files.themeConfig)
+  gulp.watch(config.files.themeConfig, {cwd: './'})
     .on('change', function (file) {
       let theme = JSON.parse(fs.readFileSync(file.path));
       sync.update_theme();

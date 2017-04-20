@@ -67,7 +67,7 @@ exports.files = {
   js_vendors: exports.paths.js + 'vendors/**/*.js',
   scss: exports.paths.scss + 'theme.base.scss',
   css: exports.paths.assets + '**/*.css',
-  minJs: exports.paths.assets + '**/*.min.js',
+  minJs: exports.paths.assets + '*.min.js',
   ignore_for_deploy: [
     '!**/*.map'
   ]
