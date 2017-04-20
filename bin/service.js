@@ -91,8 +91,8 @@ function upload_single(file, cb, env) {
   let isBinary = file.path.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
   let fileContents = fs.readFileSync(file.path, !isBinary ? {
-      encoding: 'utf-8'
-    } : null);
+    encoding: 'utf-8'
+  } : null);
 
   if (isBinary) {
     fileContents = new Buffer(fileContents).toString('base64');
@@ -158,8 +158,8 @@ function upload_all(files, cb, env) {
     let binaryFiles = config.binaryFileTypes.join('|');
     let isBinary = file.match(new RegExp(`\.(${binaryFiles})$`, 'i'));
     let fileContents = fs.readFileSync(file, !isBinary ? {
-        encoding: 'utf-8'
-      } : null);
+      encoding: 'utf-8'
+    } : null);
 
     if (isBinary) {
       fileContents = new Buffer(fileContents).toString('base64');
@@ -177,9 +177,7 @@ function upload_all(files, cb, env) {
     assets: assets
   };
 
-  if (env === 'development') {
-    data.school_id = config.getSchoolId(env);
-  }
+  data.school_id = config.getSchoolId(env);
 
   request({
     uri: uri,
