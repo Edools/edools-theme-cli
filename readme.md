@@ -6,9 +6,29 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 * NodeJs ( < v7 until now, because the lib **node-sass** not support linux 64bits )
 
-### Getting Started
+### Installation and update
 
 `$ npm i -g edools-theme-cli`
+
+### Changes in 3.0.0
+
+The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the example bellow:
+
+Example of 3.0.0 `theme.json`
+
+```
+{
+  "name": "My Nice Theme",
+  "description": "...",
+  "author": "Nice Author",
+  "production": {
+    "url": "http://my-school-url.com",
+    "school_id": 123,
+    "theme_id": 321,
+    "token": "my-nice-token"
+  }
+}
+```
 
 ### Theme Structure
 
