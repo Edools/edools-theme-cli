@@ -9,40 +9,40 @@ let through = require('through2');
 let config = require('./config');
 let url = require('url');
 
-function ensureDirectoryExistence(filePath) {
-  var dirname = path.dirname(filePath);
+require('events').EventEmitter.defaultMaxListeners = Infinity;
 
-  if (fs.existsSync(dirname)) {
+function ensureDirectoryExistence(filePath) {
+  let dirName = path.dirname(filePath);
+
+  if (fs.existsSync(dirName)) {
     return true;
   }
 
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
+  ensureDirectoryExistence(dirName);
+  fs.mkdirSync(dirName);
 }
 
-function is_protected_theme(cb) {
-  let uri = config.theme.sandbox_url || config.theme.development.url;
-  uri = url.resolve(uri, '/themes/params');
+function save_downloaded_asset(asset) {
+  if (!asset.key || (config.isBowerEnabled() && asset.key.indexOf('theme.base.') !== -1)) {
+    return;
+  }
 
-  request({
-    uri: uri,
-    method: 'GET',
-  }, function (err, res) {
-    if (err) {
-      handle_response_error(err, res);
-      return;
-    }
+  let key = asset.key;
+  let isImage = key.match(/\.(gif|jpg|jpeg|png|svg)$/i);
+  let isBinary = asset.src !== null;
+  let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
 
-    let json = JSON.parse(res.body);
+  let tardetFilePath = path.join(config.paths.base, targetPath);
 
-    if (cb && typeof cb === 'function') cb(json.school.theme_protected);
-  });
+  ensureDirectoryExistence(tardetFilePath);
+
+  fs.writeFileSync(tardetFilePath, asset.body, isBinary ? 'base64' : 'utf-8');
 }
 
 function handle_response_error(err, res) {
   if (err) {
     let msg = err;
-    if (typeof msg != 'string') {
+    if (typeof msg !== 'string') {
       msg = JSON.stringify(msg, null, 2);
     }
 
@@ -69,36 +69,47 @@ function handle_response_error(err, res) {
   }
 }
 
-function save_downloaded_asset(asset) {
-  if (!asset.key || (config.isBowerEnabled() && asset.key.indexOf('theme.base.') != -1)) {
-    return
-  }
+function is_protected_theme(env, cb) {
+  let uri = config.getApiUrl(env);
 
-  let key = asset.key;
-  let isImage = key.match(/\.(gif|jpg|jpeg|png|svg)$/i);
-  let isBinary = asset.src !== null;
-  let targetPath = isImage ? 'assets/images/' + key.replace('assets/', '') : key;
+  config.isDefaultTheme((isDefault) => {
+    if (isDefault && env === 'development') {
+      cb(false);
+      return;
+    } else if (isDefault && env !== 'development') {
+      cb(true);
+      return;
+    }
 
-  let tardetFilePath = path.join(config.paths.base, targetPath);
+    request({
+      uri: uri,
+      method: 'GET',
+      headers: config.getDefaultRequestHeaders(env)
+    }, function (err, res) {
+      if (err) {
+        handle_response_error(err, res);
+        return;
+      }
 
-  ensureDirectoryExistence(tardetFilePath);
-
-  fs.writeFileSync(tardetFilePath, asset.body, isBinary ? 'base64' : 'utf-8');
+      let json = JSON.parse(res.body);
+      if (cb && typeof cb === 'function') cb(json.protected);
+    });
+  });
 }
 
-function upload_single(file, cb, env) {
+function upload_single(env, file, cb) {
   let key = file.path.replace(config.paths.base + config.paths.dist, '');
   let isBinary = file.path.match(/\.(gif|jpg|jpeg|png|svg)$/i);
 
   let fileContents = fs.readFileSync(file.path, !isBinary ? {
-      encoding: 'utf-8'
-    } : null);
+    encoding: 'utf-8'
+  } : null);
 
   if (isBinary) {
     fileContents = new Buffer(fileContents).toString('base64');
   }
 
-  let uri = config.getSchoolUrl(env, '/sync/' + key);
+  let uri = config.getApiUrl(env, '/sync/' + key);
 
   request({
     uri: uri,
@@ -123,8 +134,8 @@ function upload_single(file, cb, env) {
   });
 }
 
-function update_theme(cb, env) {
-  let uri = config.getSchoolUrl(env, '/sync/update_theme');
+function update_theme(env, cb) {
+  let uri = config.getApiUrl(env, '/sync/update_theme');
   let theme = JSON.parse(fs.readFileSync(config.paths.base + 'theme.json'));
 
   request({
@@ -151,15 +162,15 @@ function update_theme(cb, env) {
   });
 }
 
-function upload_all(files, cb, env) {
+function upload_all(env, files, cb) {
   let assets = _.map(files, (file) => {
     let key = file.replace(config.paths.dist, '');
 
     let binaryFiles = config.binaryFileTypes.join('|');
     let isBinary = file.match(new RegExp(`\.(${binaryFiles})$`, 'i'));
     let fileContents = fs.readFileSync(file, !isBinary ? {
-        encoding: 'utf-8'
-      } : null);
+      encoding: 'utf-8'
+    } : null);
 
     if (isBinary) {
       fileContents = new Buffer(fileContents).toString('base64');
@@ -171,13 +182,14 @@ function upload_all(files, cb, env) {
     };
   });
 
-  let uri = config.getSchoolUrl(env, '/sync/batch');
+  let uri = config.getApiUrl(env, '/sync/batch');
+  let schoolUrl = config.theme[env].url;
 
   let data = {
     assets: assets
   };
 
-  if (uri.indexOf('core.myedools') < 0) {
+  if (schoolUrl.indexOf('core.myedools') < 0) {
     data.school_id = config.getSchoolId(env);
   }
 
@@ -194,14 +206,14 @@ function upload_all(files, cb, env) {
       return;
     }
 
-    update_theme(() => {
+    update_theme(env, () => {
       if (cb && typeof cb === 'function') cb(err, files);
     });
   });
 }
 
-function download_single(key, cb, env) {
-  let uri = config.getSchoolUrl(env, '/sync/' + key);
+function download_single(env, file, cb) {
+  let uri = config.getApiUrl(env, '/sync/' + file);
 
   request({
     uri: uri,
@@ -209,12 +221,12 @@ function download_single(key, cb, env) {
     headers: config.getDefaultRequestHeaders(env),
     json: {
       school_id: config.getSchoolId(env),
-      key: key
+      key: file
     }
   }, function (err, res) {
     if (!err && res && res.statusCode === 200) {
       save_downloaded_asset(res.body);
-      gutil.log(gutil.colors.green(`${key} downloaded successfully!`));
+      gutil.log(gutil.colors.green(`${file} downloaded successfully!`));
     } else {
       handle_response_error(err, res);
       return;
@@ -224,8 +236,8 @@ function download_single(key, cb, env) {
   });
 }
 
-function download_all(cb, env) {
-  let uri = config.getSchoolUrl(env, '/sync/');
+function download_all(env, cb) {
+  let uri = config.getApiUrl(env, '/sync/');
 
   request({
     uri: uri,
@@ -253,7 +265,7 @@ function download_all(cb, env) {
 }
 
 const upload_single_stream = through.obj((file, enc, callback) => {
-  upload_single(file, (err, file) => {
+  upload_single(config.env, file, (err, file) => {
     callback(err, file);
   });
 });

@@ -10,8 +10,9 @@ let browserSync = require('browser-sync').create();
 let sync = require('../service');
 
 gulp.task('serve', ['build'], () => {
-
-  browserSync.init(config.browser_sync);
+  let bsConfig = config.browser_sync;
+  bsConfig.proxy = config.theme[config.env].url;
+  browserSync.init(bsConfig);
 
   gulp.watch(config.paths.scss + '**/*.scss', {cwd: './'}, ['scss'])
     .on('change', function (file) {
@@ -29,7 +30,7 @@ gulp.task('serve', ['build'], () => {
     .concat(config.files.ignore_for_deploy), {cwd: './'})
     .on('change', function (file) {
       if (fs.lstatSync(file.path).isDirectory()) return;
-      sync.upload_single(file, (err, f) => {
+      sync.upload_single(config.env, file, (err, f) => {
         if (f.path.indexOf('.liquid') > -1 ||
           f.path.indexOf('.json') > -1 ||
           f.path.indexOf('.js') > -1) {
@@ -39,8 +40,7 @@ gulp.task('serve', ['build'], () => {
     });
 
   gulp.watch(config.files.themeConfig, {cwd: './'})
-    .on('change', function (file) {
-      let theme = JSON.parse(fs.readFileSync(file.path));
-      sync.update_theme();
+    .on('change', () => {
+      sync.update_theme(config.env);
     });
 });

@@ -8,10 +8,10 @@ let fs = require('fs');
 let path = require('path');
 let gutil = require('gulp-util');
 let inquirer = require('inquirer');
-let git = require('simple-git');
 let utils = require('./utils');
 let pkg = require('../package.json');
 let config = require('./config');
+let git = require('simple-git')(config.paths.base);
 let wrench = require('wrench');
 let service = require('./service');
 
@@ -45,9 +45,13 @@ function init(name, author) {
   fs.writeFileSync(config.paths.base + 'theme.json', JSON.stringify(themeJson, null, 2));
 }
 
-function serve() {
-  service.is_protected_theme((isProtected) => {
-    if (isProtected != true) {
+function serve(env) {
+  env = config.handleEnv(env);
+  config.env = env;
+  config.isEnvValid(env);
+
+  service.is_protected_theme(env, (isProtected) => {
+    if (isProtected !== true) {
       gulp.start('serve');
     } else {
       gutil.log(gutil.colors.red('This theme is protected, you can\'t live edit protected themes!'));
@@ -55,9 +59,21 @@ function serve() {
   });
 }
 
-function upload(file) {
-  service.is_protected_theme((isProtected) => {
-    if (isProtected != true) {
+function upload(file = null, env = null) {
+
+  // Handle command without file argument. Eg: edt u development
+  let envs = ['development', 'staging', 'production'];
+  if (envs.indexOf(file) > -1 && env === null) {
+    env = file;
+    file = null;
+  }
+
+  env = config.handleEnv(env);
+  config.env = env;
+  config.isEnvValid(env);
+
+  service.is_protected_theme(env, (isProtected) => {
+    if (isProtected !== true) {
       if (!file || !fs.statSync(file).isFile()) {
         inquirer.prompt([
           {
@@ -72,7 +88,7 @@ function upload(file) {
         });
       } else {
         // upload single file
-        service.upload_single({
+        service.upload_single(config.env, {
           path: file
         });
       }
@@ -82,7 +98,20 @@ function upload(file) {
   });
 }
 
-function download(file) {
+function download(file = null, env = null) {
+
+  // Handle command without file argument. Eg: edt u development
+  let envs = ['development', 'staging', 'production'];
+  if (envs.indexOf(file) > -1 && env === null) {
+    env = file;
+    file = null;
+  }
+
+  env = config.handleEnv(env);
+
+  config.env = env;
+  config.isEnvValid(env);
+
   if (!file) {
     inquirer.prompt([
       {
@@ -93,11 +122,11 @@ function download(file) {
       }
     ]).then((res) => {
       // download all files
-      if (res.ok === true) service.download_all();
+      if (res.ok === true) service.download_all(env);
     });
   } else {
     // download single file
-    service.download_single(file);
+    service.download_single(env, file);
   }
 }
 
@@ -106,13 +135,12 @@ function build() {
 }
 
 function deploy(env) {
-  let git = require('simple-git')(config.paths.base);
-
   git.status((err, res) => {
     let branch = res.current;
     let modified = res.files.length > 0;
 
-    if ((env == 'staging' && branch != 'dev') || (env == 'production' && branch != 'master')) {
+    config.isEnvValid(env);
+    if ((env === 'staging' && branch !== 'dev') || (env === 'production' && branch !== 'master')) {
       gutil.log(gutil.colors.red('You cannot deploy from branch "' + branch + '", you can only deploy from "dev" for staging or "master" for production.'));
       return;
     }
@@ -153,9 +181,9 @@ let cli = () => {
    * Serve Command
    */
   program
-    .command('serve')
+    .command('serve [env]')
     .alias('s')
-    .description('Create a local server which observes for changes in your local files and upload it to your sandbox url.')
+    .description('Create a local server which observes for changes in your local files and upload it to your enviroment url.')
     .action(this.serve);
 
 
@@ -163,7 +191,7 @@ let cli = () => {
    * Upload Command
    */
   program
-    .command('upload [file]')
+    .command('upload [file] [env]')
     .alias('u')
     .description('Upload a file or uploads all files by giving empty file arg.')
     .action(this.upload);
@@ -173,7 +201,7 @@ let cli = () => {
    * Download Command
    */
   program
-    .command('download [file]')
+    .command('download [file] [env]')
     .alias('d')
     .description('Download a file or download all files by giving empty file arg.')
     .action(this.download);
