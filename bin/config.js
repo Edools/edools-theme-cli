@@ -15,6 +15,15 @@ exports.fileExists = (filePath) => {
   }
 };
 
+exports.folderExists = (folderPath) => {
+  try {
+    return fs.statSync(folderPath).isDirectory();
+  }
+  catch (err) {
+    return false;
+  }
+};
+
 exports.binaryFileTypes = ['gif', 'jpg', 'jpeg', 'png', 'svg'];
 
 exports.paths = {
@@ -73,10 +82,9 @@ exports.files = {
   ]
 };
 
-exports.files['images'] = exports.binaryFileTypes.map((t) => {
+exports.files.images = exports.binaryFileTypes.map((t) => {
   return `${exports.paths.images}**/*.${t}`;
 });
-
 
 exports.build = {
   js: 'theme.base.min.js',
@@ -88,28 +96,59 @@ const themePath = exports.paths.base + 'theme.json';
 const cssCombPath = exports.paths.base + '.csscomb.json';
 const bowerJsonPath = exports.paths.base + 'bower.json';
 const scssMainPath = exports.paths.scss + 'theme.base.scss';
+const apiUrls = {
+  development: 'http://demo.edools-dev.com:3000',
+  staging: 'https://core.myedools.info',
+  production: 'https://core.myedools.com'
+};
 
 exports.theme = exports.fileExists(themePath) ? require(themePath) : {};
 exports.cssCombConfig = exports.fileExists(cssCombPath) ? require(cssCombPath) : {};
 
+exports.isGit = (cb) => {
+  cb(exports.folderExists(exports.paths.base + '.git'));
+};
+
+exports.isDefaultTheme = (cb) => {
+  if (exports.isGit) {
+    let git = require('simple-git')(exports.paths.base);
+    git.getRemotes(true, (err, remotes) => {
+      let origin = _.find(remotes, {name: 'origin'});
+
+      if (!origin) {
+        cb(false);
+      }
+
+      cb(origin.refs.fetch.indexOf('/elegance.git') > -1);
+    });
+  } else {
+    cb(false);
+  }
+};
+
 exports.isThemeConfigValid = () => {
-  return (exports.theme &&
-  (exports.theme.sandbox_url &&
-  exports.theme.sandbox_theme_id &&
-  exports.theme.sandbox_school_id &&
-  exports.theme.token) ||
-  (exports.theme.development &&
-  exports.theme.development.theme_id &&
-  exports.theme.development.school_id &&
-  exports.theme.development.token) ||
-  (exports.theme.staging &&
-  exports.theme.staging.theme_id &&
-  exports.theme.staging.school_id &&
-  exports.theme.staging.token) ||
-  (exports.theme.production &&
-  exports.theme.production.theme_id &&
-  exports.theme.production.school_id &&
-  exports.theme.production.token));
+  return (Boolean)(exports.theme &&
+    (exports.theme.development &&
+    exports.theme.development.theme_id &&
+    exports.theme.development.school_id &&
+    exports.theme.development.token) ||
+    (exports.theme.staging &&
+    exports.theme.staging.theme_id &&
+    exports.theme.staging.school_id &&
+    exports.theme.staging.token) ||
+    (exports.theme.production &&
+    exports.theme.production.theme_id &&
+    exports.theme.production.school_id &&
+    exports.theme.production.token));
+};
+
+exports.isEnvValid = (env) => {
+  if (!exports.theme[env]) {
+    gutil.log(gutil.colors.red('[Invalid Enviroment]'), `Missing '${env}' in your theme.json`);
+    process.exit();
+  }
+
+  return true;
 };
 
 exports.isBowerEnabled = () => {
@@ -124,32 +163,43 @@ exports.isCSSCombEnabled = () => {
   return exports.fileExists(cssCombPath);
 };
 
-exports.getSchoolUrl = (env, path) => {
+exports.handleEnv = (env) => {
+  if (!env && exports.theme.development &&
+    exports.theme.development.school_id === 1) {
+    env = 'development';
+  } else if (!env) {
+    env = 'production';
+  }
+
+  return env;
+};
+
+exports.getApiUrl = (env, path = null) => {
   env = env || 'development';
 
-  if (!exports.isThemeConfigValid() && !exports.theme.sandbox_theme_id && !exports.theme[env]) {
+  if (!exports.isThemeConfigValid() && !exports.theme[env]) {
     gutil.log(gutil.colors.red('Your theme.json file is invalid, please check if you have all needed information in theme.json file.'));
     throw '';
   }
 
-  let themeId = exports.theme.sandbox_theme_id || exports.theme[env].theme_id;
-  let apiUrl = exports.theme.sandbox_url || exports.theme[env].url;
+  let themeId = exports.theme[env].theme_id;
+  let apiUrl = apiUrls[env];
 
-  return url.resolve(apiUrl, '/api/themes/' + themeId + path);
+  return url.resolve(apiUrl, `/api/themes/${themeId}${path ? path : ''}`);
 };
 
 exports.getDefaultRequestHeaders = (env) => {
   env = env || 'development';
 
   return {
-    'Authorization': 'Token token=' + (exports.theme.token || exports.theme[env].token)
+    'Authorization': 'Token token=' + exports.theme[env].token
   };
 };
 
 exports.getSchoolId = (env) => {
-  env = env || 'development';
+  env = env || 'production';
 
-  return exports.theme.sandbox_school_id || exports.theme[env].school_id;
+  return exports.theme[env].school_id;
 };
 
 exports.wiredep = {
@@ -185,7 +235,6 @@ exports.browser_sync = {
     exports.paths.dist + exports.paths.assets + '*.js'
   ],
   serveStatic: [exports.paths.dist],
-  proxy: exports.theme.sandbox_url || exports.theme.development ? exports.theme.development.url : '',
   port: 5000,
   ghostMode: false,
   rewriteRules: [

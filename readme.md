@@ -6,9 +6,29 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 * NodeJs ( < v7 until now, because the lib **node-sass** not support linux 64bits )
 
-### Getting Started
+### Installation and update
 
 `$ npm i -g edools-theme-cli`
+
+### Changes in 3.0.0
+
+The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
+
+Example of 3.0.0 `theme.json`
+
+```
+{
+  "name": "My Nice Theme",
+  "description": "...",
+  "author": "Nice Author",
+  "production": {
+    "url": "http://my-school-url.com",
+    "school_id": 123,
+    "theme_id": 321,
+    "token": "my-nice-token"
+  }
+}
+```
 
 ### Theme Structure
 
@@ -16,7 +36,7 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 .
 ├── assets
 │   ├── images                      # Theme Images (optional).
-│   │                 
+│   │
 │   ├── js                          # Theme Javascript Files (optional).
 │   │
 │   ├── scss                        # Theme Scss Files (optional).
@@ -70,12 +90,12 @@ Creates an empty theme with basic configuration. You can use this command to sta
 
 Command: `edt init` or `edt i`
 
-Example: 
+Example:
 
 ```
-mkdir my-theme 
+mkdir my-theme
 
-cd my-theme 
+cd my-theme
 
 edt i "My Theme" "Author Name"
 ```
@@ -84,17 +104,19 @@ edt i "My Theme" "Author Name"
 
 Creates a proxy server for realtime edit. When serve is running all of your local changes will be uploaded to your online theme. The browser will be reloaded automatically when you change a file.
 
-Default url: [https://localhost:3000](https://localhost:3000)
+Default url: [https://localhost:5000](https://localhost:3000)
 
+Command: `edt serve [env]` or `edt s [env]`
 
-Command: `edt serve` or `edt s`
+Params: 
 
-Create a local server which observes for changes in your local files and upload the files to your sandbox url.
+* `env`:  [development, staging, production] (optional) default: production
+
+Example: `edt s`, `edt s staging`, `edt s development`
 
 #### Build
 
 Builds theme's assets like scss, js and bower js files.
-
 
 Command: `edt build` or `edt b`
 
@@ -102,9 +124,14 @@ Command: `edt build` or `edt b`
 
 Uploads a single file or the entire theme if no file path provided.
 
-Command: `edt upload` or `edt u`
+Command: `edt upload [file] [env]` or `edt u [file] [env]`
 
-Example: `edt u templates/index.liquid`
+Params: 
+
+* `file`:  file path (optional)
+* `env`:  [development, staging, production] (optional) default: production
+
+Example: `edt u templates/index.liquid`, `edt u templates/index.liquid staging`
 
 ##### Warning: This command replaces the remote file, if you doesn't input a file path, all of the remote files will be overriden by local files.
 
@@ -113,9 +140,14 @@ Example: `edt u templates/index.liquid`
 
 Downloads a single file or the entire theme if no file path provided.
 
-Command: `edt download` or `edt d`
+Command: `edt download [file] [env]` or `edt d [file] [env]`
 
-Example: `edt d templates/index.liquid`
+Params: 
+
+* `file`:  file path (optional)
+* `env`:  [development, staging, production] (optional) default: production
+
+Example: `edt d templates/index.liquid`, `edt d templates/index.liquid staging`
 
 ##### Warning: This command replaces the local file, if you doesn't input a file path, all of the local files will be overriden by remote files.
 
