@@ -12,7 +12,9 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 ### Changes in 3.0.0
 
-The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
+* Needs NodeJS  >= v6 LTS.
+
+* The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
 
 Example of 3.0.0 `theme.json`
 
