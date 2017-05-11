@@ -84,7 +84,7 @@ function upload(file = null, env = null) {
           }
         ]).then((res) => {
           // upload all files
-          if (res.ok === true) gulp.start('deploy:development');
+          if (res.ok === true) gulp.start('deploy:' + env);
         });
       } else {
         // upload single file
