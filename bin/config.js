@@ -97,7 +97,7 @@ const cssCombPath = exports.paths.base + '.csscomb.json';
 const bowerJsonPath = exports.paths.base + 'bower.json';
 const scssMainPath = exports.paths.scss + 'theme.base.scss';
 const apiUrls = {
-  development: 'http://demo.edools-dev.com:3000',
+  development: 'http://core.edools-dev.com:3000',
   staging: 'https://core.myedools.info',
   production: 'https://core.myedools.com'
 };
@@ -119,7 +119,7 @@ exports.isDefaultTheme = (cb) => {
         cb(false);
       }
 
-      cb(origin.refs.fetch.indexOf('/elegance.git') > -1);
+      cb(origin.refs.fetch.indexOf('/elegance') > -1);
     });
   } else {
     cb(false);
