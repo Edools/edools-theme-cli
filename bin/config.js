@@ -119,7 +119,7 @@ exports.isDefaultTheme = (cb) => {
         cb(false);
       }
 
-      cb(origin.refs.fetch.indexOf('/elegance.git') > -1);
+      cb(origin.refs.fetch.indexOf('/elegance') > -1);
     });
   } else {
     cb(false);
