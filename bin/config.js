@@ -185,7 +185,7 @@ exports.getApiUrl = (env, path = null) => {
   let themeId = exports.theme[env].theme_id;
   let apiUrl = apiUrls[env];
 
-  return url.resolve(apiUrl, `/api/themes/${themeId}${path ? path : ''}`);
+  return url.resolve(apiUrl, `/themes/${themeId}${path ? path : ''}`);
 };
 
 exports.getDefaultRequestHeaders = (env) => {
