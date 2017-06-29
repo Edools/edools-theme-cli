@@ -110,20 +110,22 @@ exports.isGit = (cb) => {
 };
 
 exports.isDefaultTheme = (cb) => {
-  if (exports.isGit()) {
-    let git = require('simple-git')(exports.paths.base);
-    git.getRemotes(true, (err, remotes) => {
-      let origin = _.find(remotes, {name: 'origin'});
+  exports.isGit(isGit => {
+    if (isGit) {
+      let git = require('simple-git')(exports.paths.base);
+      git.getRemotes(true, (err, remotes) => {
+        let origin = _.find(remotes, {name: 'origin'});
 
-      if (!origin) {
-        cb(false);
-      }
+        if (!origin) {
+          cb(false);
+        }
 
-      cb(origin.refs.fetch.indexOf('/elegance') > -1);
-    });
-  } else {
-    cb(false);
-  }
+        cb(origin.refs.fetch.indexOf('/elegance') > -1);
+      });
+    } else {
+      cb(false);
+    }
+  });
 };
 
 exports.isThemeConfigValid = () => {
