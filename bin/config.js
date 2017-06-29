@@ -110,7 +110,7 @@ exports.isGit = (cb) => {
 };
 
 exports.isDefaultTheme = (cb) => {
-  if (exports.isGit) {
+  if (exports.isGit()) {
     let git = require('simple-git')(exports.paths.base);
     git.getRemotes(true, (err, remotes) => {
       let origin = _.find(remotes, {name: 'origin'});
