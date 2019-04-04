@@ -1,0 +1,10 @@
+{
+  "extends": "oclif",
+  "rules": {
+    "semi": ["error", "always"],
+    "camelcase": 0,
+    "comma-dangle": 0,
+    "no-negated-condition": 0,
+    "no-else-return": 0
+  }
+}

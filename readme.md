@@ -1,162 +1,68 @@
-# Edools Theme CLI
+edools-theme-cli
+================
 
-The Edools Theme CLI is a command line tool that allows you to manage and edit theme files directly on your computer.
+A starter kit to make Edools Themes
 
-### Requirements
+[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
+[![Version](https://img.shields.io/npm/v/edools-theme-cli.svg)](https://npmjs.org/package/edools-theme-cli)
+[![Downloads/week](https://img.shields.io/npm/dw/edools-theme-cli.svg)](https://npmjs.org/package/edools-theme-cli)
+[![License](https://img.shields.io/npm/l/edools-theme-cli.svg)](https://github.com/[object Object]/blob/master/package.json)
 
-* NodeJs ( < v7 until now, because the lib **node-sass** not support linux 64bits )
+<!-- toc -->
+* [Usage](#usage)
+* [Commands](#commands)
+<!-- tocstop -->
+# Usage
+<!-- usage -->
+```sh-session
+$ npm install -g edools-theme-cli
+$ edools-theme-cli COMMAND
+running command...
+$ edools-theme-cli (-v|--version|version)
+edools-theme-cli/3.1.0 darwin-x64 node-v10.15.1
+$ edools-theme-cli --help [COMMAND]
+USAGE
+  $ edools-theme-cli COMMAND
+...
+```
+<!-- usagestop -->
+# Commands
+<!-- commands -->
+* [`edools-theme-cli hello`](#edools-theme-cli-hello)
+* [`edools-theme-cli help [COMMAND]`](#edools-theme-cli-help-command)
 
-### Installation and update
+## `edools-theme-cli hello`
 
-`$ npm i -g edools-theme-cli`
-
-### Changes in 3.0.0
-
-* Needs NodeJS  >= v6 LTS.
-
-* The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
-
-Example of 3.0.0 `theme.json`
+Describe the command here
 
 ```
-{
-  "name": "My Nice Theme",
-  "description": "...",
-  "author": "Nice Author",
-  "production": {
-    "url": "http://my-school-url.com",
-    "school_id": 123,
-    "theme_id": 321,
-    "token": "my-nice-token"
-  }
-}
+USAGE
+  $ edools-theme-cli hello
+
+OPTIONS
+  -n, --name=name  name to print
+
+DESCRIPTION
+  ...
+  Extra documentation goes here
 ```
 
-### Theme Structure
+_See code: [src/commands/hello.js](https://github.com/Edools/edools-theme-cli/blob/v3.1.0/src/commands/hello.js)_
+
+## `edools-theme-cli help [COMMAND]`
+
+display help for edools-theme-cli
 
 ```
-.
-├── assets
-│   ├── images                      # Theme Images (optional).
-│   │
-│   ├── js                          # Theme Javascript Files (optional).
-│   │
-│   ├── scss                        # Theme Scss Files (optional).
-│   │    │
-│   │    └── theme.base.scss        # Main scss file, you can import other scss files
-│   │                                 inside scss folder. (required if you want to use scss).
-│   │
-│   ├── theme.js.liquid             # Use this file if you want to merge liquid params into javascript.
-│   │
-│   └── theme.scss.liquid           # Use this file if you want to merge liquid params into scss.
-│
-├── config
-│   │
-│   ├── settings_data_schema.json   # Theme customization schema.
-│   │
-│   ├── settings_data.json          # Theme customization data.
-│
-│
-├── layouts                         # Liquid layouts
-│
-├── locales                         # i18n json files
-│
-├── mailers                         # Email Templates
-│
-├── snippets                        # Liquid snippets
-│
-├── templates                       # Liquid templates
-│
-├── .csscomb.json                   # CSSComb config (optional) read more at http://csscomb.com.
-│
-├── bower.json                      # Bower config (optional).
-│
-├── theme.json                      # Theme config file.
+USAGE
+  $ edools-theme-cli help [COMMAND]
 
+ARGUMENTS
+  COMMAND  command to show help for
 
+OPTIONS
+  --all  see all commands in CLI
 ```
 
-### Commands
-
-You can use `edools-theme` or the alias `edt`
-
-Ps: All of the following commands needs to be executed in the target theme folder.
-
-`-h` help
-
-`-V` version
-
-#### Start a New Theme:
-
-Creates an empty theme with basic configuration. You can use this command to start editing an existing theme downloaded from your school.
-
-Command: `edt init` or `edt i`
-
-Example:
-
-```
-mkdir my-theme
-
-cd my-theme
-
-edt i "My Theme" "Author Name"
-```
-
-#### Serve
-
-Creates a proxy server for realtime edit. When serve is running all of your local changes will be uploaded to your online theme. The browser will be reloaded automatically when you change a file.
-
-Default url: [https://localhost:5000](https://localhost:3000)
-
-Command: `edt serve [env]` or `edt s [env]`
-
-Params: 
-
-* `env`:  [development, staging, production] (optional) default: production
-
-Example: `edt s`, `edt s staging`, `edt s development`
-
-#### Build
-
-Builds theme's assets like scss, js and bower js files.
-
-Command: `edt build` or `edt b`
-
-#### Upload Files to School
-
-Uploads a single file or the entire theme if no file path provided.
-
-Command: `edt upload [file] [env]` or `edt u [file] [env]`
-
-Params: 
-
-* `file`:  file path (optional)
-* `env`:  [development, staging, production] (optional) default: production
-
-Example: `edt u templates/index.liquid`, `edt u templates/index.liquid staging`
-
-##### Warning: This command replaces the remote file, if you doesn't input a file path, all of the remote files will be overriden by local files.
-
-
-#### Download Files to Local Folder
-
-Downloads a single file or the entire theme if no file path provided.
-
-Command: `edt download [file] [env]` or `edt d [file] [env]`
-
-Params: 
-
-* `file`:  file path (optional)
-* `env`:  [development, staging, production] (optional) default: production
-
-Example: `edt d templates/index.liquid`, `edt d templates/index.liquid staging`
-
-##### Warning: This command replaces the local file, if you doesn't input a file path, all of the local files will be overriden by remote files.
-
-
-### Development
-
-* Clone Repository
-* Run `$ cd edools-theme-cli && npm i`
-* Run `$ npm link .`
-* Run `$ npm run dev`
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
+<!-- commandsstop -->

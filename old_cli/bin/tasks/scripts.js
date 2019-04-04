@@ -2,7 +2,6 @@
 
 let gulp = require('gulp');
 let $ = require('gulp-load-plugins')();
-let es2015 = require('babel-preset-es2015');
 let config = require('../config');
 let wiredep = require('wiredep');
 
@@ -27,7 +26,7 @@ gulp.task('js', () => {
     .pipe($.sourcemaps.init())
     .pipe($.concat(config.build.js))
     .pipe($.babel({
-      presets: [es2015]
+      presets: ['@babel/preset-env']
     }))
     .pipe($.uglify().on('error', config.errorHandler('uglify')))
     .pipe($.sourcemaps.write('.'))
