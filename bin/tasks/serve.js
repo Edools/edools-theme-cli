@@ -11,7 +11,7 @@ let sync = require('../service');
 
 gulp.task('serve', ['build'], () => {
   let bsConfig = config.browser_sync;
-  bsConfig.proxy = config.theme[config.env].url;
+  bsConfig.proxy = `${config.theme[config.env].url}?design_theme_id=${config.getThemeId(config.env)}`;
   browserSync.init(bsConfig);
 
   gulp.watch(config.paths.scss + '**/*.scss', {cwd: './'}, ['scss'])

@@ -204,6 +204,12 @@ exports.getSchoolId = (env) => {
   return exports.theme[env].school_id;
 };
 
+exports.getThemeId = (env) => {
+  env = env || 'production';
+
+  return exports.theme[env].theme_id;
+};
+
 exports.wiredep = {
   exclude: [
     /\/bootstrap-sass\/.*\.js/
