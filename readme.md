@@ -1,3 +1,5 @@
+[![GitHub version](https://badge.fury.io/gh/Edools%2Fedools-theme-cli.svg)](https://badge.fury.io/gh/Edools%2Fedools-theme-cli)
+
 # Edools Theme CLI
 
 The Edools Theme CLI is a command line tool that allows you to manage and edit theme files directly on your computer.
@@ -10,13 +12,13 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 `$ npm i -g edools-theme-cli`
 
-### Changes in 3.0.0
+### Changes in this version
 
 * Needs NodeJS  >= v6 LTS.
 
-* The 3.0.0 version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
+* This version changes the way that CLI handles your `theme.json` file. If your `theme.json` uses `development` as enviroment, please change it to `production` enviroment as in the bellow example:
 
-Example of 3.0.0 `theme.json`
+Example `theme.json`
 
 ```
 {
