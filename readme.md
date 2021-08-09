@@ -4,7 +4,7 @@ The Edools Theme CLI is a command line tool that allows you to manage and edit t
 
 ### Requirements
 
-* NodeJs 8.12.16
+* NodeJs 8.16.2
 
 ### Installation and update
 
