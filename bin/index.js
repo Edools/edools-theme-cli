@@ -32,7 +32,7 @@ function init(name, author) {
     "description": "put-your-theme-description-here",
     "author": author || '',
     "folder_name": name,
-    "development": {
+    "production": {
       "url": "https://myschool.com",
       "school_id": 0,
       "theme_id": 0,
